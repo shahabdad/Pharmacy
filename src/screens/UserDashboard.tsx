@@ -9,6 +9,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    useColorScheme,
 } from 'react-native';
 import { PrescriptionCard } from '../components/PrescriptionCard';
 import { prescriptionService } from '../services/prescriptionService';
@@ -32,6 +33,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const dark = useColorScheme() === 'dark';
 
   useEffect(() => {
     loadData();
@@ -57,7 +59,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -93,15 +95,15 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={[styles.centerContainer, { backgroundColor: dark ? '#0D1117' : '#f9f9f9' }]}>
         <ActivityIndicator size="large" color="#4A90E2" />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
+    <ScrollView style={[styles.container, { backgroundColor: dark ? '#0D1117' : '#f9f9f9' }]}>
+      <View style={[styles.header, { backgroundColor: dark ? '#161B22' : '#4A90E2' }]}>
         <Text style={styles.greeting}>Welcome, {user.name}!</Text>
         <TouchableOpacity onPress={onLogout}>
           <Text style={styles.logoutButton}>Logout</Text>
@@ -109,25 +111,32 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Upload Prescription</Text>
+        <Text style={[styles.sectionTitle, { color: dark ? '#F0F6FC' : '#333' }]}>Upload Prescription</Text>
 
         {selectedImage && (
           <Image source={{ uri: selectedImage }} style={styles.previewImage} />
         )}
 
-        <TouchableOpacity style={styles.pickButton} onPress={pickImage}>
+        <TouchableOpacity
+          style={[styles.pickButton, {
+            backgroundColor: dark ? '#161B22' : '#fff',
+            borderColor: '#4A90E2',
+          }]}
+          onPress={pickImage}
+        >
           <Text style={styles.pickButtonText}>
             {selectedImage ? '📷 Change Image' : '📷 Pick Image'}
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.label}>Select Shop:</Text>
+        <Text style={[styles.label, { color: dark ? '#8B949E' : '#333' }]}>Select Shop:</Text>
         <ScrollView horizontal style={styles.shopList}>
           {shops.map(shop => (
             <TouchableOpacity
               key={shop.id}
               style={[
                 styles.shopButton,
+                { backgroundColor: dark ? '#161B22' : '#fff', borderColor: dark ? '#21262D' : '#E0E0E0' },
                 selectedShop === shop.id && styles.shopButtonActive,
               ]}
               onPress={() => setSelectedShop(shop.id)}
@@ -135,6 +144,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
               <Text
                 style={[
                   styles.shopButtonText,
+                  { color: dark ? '#8B949E' : '#333' },
                   selectedShop === shop.id && styles.shopButtonTextActive,
                 ]}
               >
@@ -156,9 +166,9 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Your Prescriptions</Text>
+        <Text style={[styles.sectionTitle, { color: dark ? '#F0F6FC' : '#333' }]}>Your Prescriptions</Text>
         {prescriptions.length === 0 ? (
-          <Text style={styles.emptyText}>No prescriptions yet</Text>
+          <Text style={[styles.emptyText, { color: dark ? '#6E7681' : '#999' }]}>No prescriptions yet</Text>
         ) : (
           prescriptions.map(prescription => (
             <PrescriptionCard
@@ -176,7 +186,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
   },
   centerContainer: {
     flex: 1,
@@ -184,7 +193,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    backgroundColor: '#4A90E2',
     padding: 20,
     paddingTop: 40,
     flexDirection: 'row',
@@ -212,13 +220,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 12,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 8,
     marginTop: 12,
   },
@@ -229,9 +235,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   pickButton: {
-    backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#4A90E2',
     borderStyle: 'dashed',
     borderRadius: 8,
     padding: 16,
@@ -247,9 +251,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   shopButton: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -262,7 +264,6 @@ const styles = StyleSheet.create({
   shopButtonText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#333',
   },
   shopButtonTextActive: {
     color: '#fff',
@@ -283,7 +284,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: '#999',
     textAlign: 'center',
     paddingVertical: 20,
   },

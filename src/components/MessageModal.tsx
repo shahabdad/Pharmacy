@@ -1,9 +1,18 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from 'react';
 import {
-    KeyboardAvoidingView, Modal, Platform,
-    Pressable, Text, TextInput, View,
+    Animated,
+    Keyboard,
+    KeyboardEvent,
+    Platform,
+    Pressable,
+    Text,
+    TextInput,
+    TouchableWithoutFeedback,
+    View,
+    useColorScheme,
 } from 'react-native';
-import Animated, { SlideInDown } from 'react-native-reanimated';
+import AnimatedRN, { FadeIn, SlideInDown } from 'react-native-reanimated';
 
 interface Props {
   visible:  boolean;
@@ -13,64 +22,173 @@ interface Props {
   onCancel: () => void;
 }
 
+/**
+ * MessageModal — absolute overlay (no RN Modal) + Keyboard listener
+ * so the sheet slides up when the keyboard appears on both iOS & Android.
+ */
 export function MessageModal({ visible, message, onChange, onNext, onCancel }: Props) {
+  const keyboardOffset = useRef(new Animated.Value(0)).current;
+  const dark = useColorScheme() === 'dark';
+
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  const T = {
+    sheetBg:      dark ? '#161B22' : '#FFFFFF',
+    handle:       dark ? '#30363D' : '#E2E8F0',
+    title:        dark ? '#F0F6FC' : '#0F172A',
+    subtitle:     dark ? '#6E7681' : '#94A3B8',
+    label:        dark ? '#8B949E' : '#374151',
+    inputBg:      dark ? '#0D1117' : '#F8FAFC',
+    inputText:    dark ? '#E6EDF3' : '#1E293B',
+    inputBorder:  dark ? '#21262D' : '#E2E8F0',
+    placeholder:  dark ? '#6E7681' : '#C7C7CC',
+    counter:      dark ? '#6E7681' : '#94A3B8',
+    cancelBg:     dark ? '#21262D' : '#F1F5F9',
+    cancelText:   dark ? '#8B949E' : '#64748B',
+    stepDot:      dark ? '#21262D' : '#E2E8F0',
+  };
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const onShow = (e: KeyboardEvent) => {
+      Animated.spring(keyboardOffset, {
+        toValue: e.endCoordinates.height,
+        useNativeDriver: true,
+        bounciness: 0,
+        speed: 20,
+      }).start();
+    };
+    const onHide = () => {
+      Animated.spring(keyboardOffset, {
+        toValue: 0,
+        useNativeDriver: true,
+        bounciness: 0,
+        speed: 20,
+      }).start();
+    };
+
+    const s1 = Keyboard.addListener(showEvent, onShow);
+    const s2 = Keyboard.addListener(hideEvent, onHide);
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
+
+  useEffect(() => {
+    if (!visible) {
+      keyboardOffset.setValue(0);
+      Keyboard.dismiss();
+    }
+  }, [visible]);
+
+  if (!visible) return null;
+
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-end"
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-      >
-        <Animated.View
-          entering={SlideInDown.springify().damping(18)}
-          className="bg-white rounded-t-[32px] px-5 pt-0 pb-8"
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 }}
-        >
-          {/* Handle */}
-          <View className="w-10 h-1 bg-gray-200 rounded-full self-center mt-3 mb-5" />
+    <AnimatedRN.View
+      entering={FadeIn.duration(180)}
+      style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 1000,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.55)',
+      }}
+    >
+      {/* Backdrop */}
+      <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); onCancel(); }}>
+        <View style={{ flex: 1 }} />
+      </TouchableWithoutFeedback>
 
-          {/* Step indicator */}
-          <View className="flex-row gap-2 mb-5">
-            <View className="h-1.5 w-14 rounded-full bg-violet-600" />
-            <View className="h-1.5 w-6 rounded-full bg-gray-200" />
-          </View>
+      {/* Sheet slides up with keyboard */}
+      <Animated.View style={{ transform: [{ translateY: Animated.multiply(keyboardOffset, -1) }] }}>
+        <TouchableWithoutFeedback onPress={() => {}}>
+          <AnimatedRN.View
+            entering={SlideInDown.springify().damping(18)}
+            style={{
+              backgroundColor: T.sheetBg,
+              borderTopLeftRadius: 32, borderTopRightRadius: 32,
+              paddingHorizontal: 20,
+              paddingBottom: Platform.OS === 'ios' ? 40 : 28,
+              shadowColor: '#000', shadowOffset: { width: 0, height: -4 },
+              shadowOpacity: dark ? 0.4 : 0.1, shadowRadius: 20, elevation: 20,
+            }}
+          >
+            {/* Handle */}
+            <View style={{
+              width: 40, height: 4, borderRadius: 2,
+              backgroundColor: T.handle,
+              alignSelf: 'center', marginTop: 12, marginBottom: 20,
+            }} />
 
-          <Text className="text-xl font-black text-gray-900 mb-1">Add a message</Text>
-          <Text className="text-xs text-gray-400 mb-5">Optional note for the pharmacist</Text>
+            {/* Step dots */}
+            <View style={{ flexDirection: 'row', gap: 6, marginBottom: 20 }}>
+              <View style={{ height: 5, width: 48, borderRadius: 3, backgroundColor: '#6C63FF' }} />
+              <View style={{ height: 5, width: 20, borderRadius: 3, backgroundColor: T.stepDot }} />
+            </View>
 
-          <Text className="text-xs font-bold text-gray-700 mb-2">Message (optional)</Text>
-          <View className="bg-gray-50 rounded-2xl px-4 py-3 mb-1 border-2 border-transparent">
-            <TextInput
-              className="text-sm text-gray-800"
-              multiline
-              numberOfLines={4}
-              maxLength={200}
-              placeholder="e.g. Please include generic alternatives..."
-              placeholderTextColor="#C7C7CC"
-              value={message}
-              onChangeText={onChange}
-              style={{ padding: 0, minHeight: 80, textAlignVertical: 'top' }}
-            />
-          </View>
-          <Text className="text-[10px] text-gray-400 text-right mb-5">{message.length}/200</Text>
+            <Text style={{ fontSize: 22, fontWeight: '900', color: T.title, marginBottom: 4, letterSpacing: -0.3 }}>
+              Add a message
+            </Text>
+            <Text style={{ fontSize: 13, color: T.subtitle, marginBottom: 20, lineHeight: 18 }}>
+              Optional note for the pharmacist
+            </Text>
 
-          <View className="flex-row gap-3">
-            <Pressable
-              className="flex-1 bg-gray-100 rounded-2xl py-4 items-center"
-              onPress={onCancel}
-            >
-              <Text className="text-sm font-bold text-gray-500">Cancel</Text>
-            </Pressable>
-            <Pressable
-              className="flex-[2] rounded-2xl py-4 items-center"
-              style={{ backgroundColor: '#6C63FF', shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 }}
-              onPress={onNext}
-            >
-              <Text className="text-sm font-bold text-white">Next →</Text>
-            </Pressable>
-          </View>
-        </Animated.View>
-      </KeyboardAvoidingView>
-    </Modal>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: T.label, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              Message (optional)
+            </Text>
+            <View style={{
+              backgroundColor: T.inputBg, borderRadius: 16,
+              paddingHorizontal: 14, paddingVertical: 12,
+              borderWidth: 1.5,
+              borderColor: message.length > 0 ? '#6C63FF' : T.inputBorder,
+              marginBottom: 6,
+            }}>
+              <TextInput
+                style={{
+                  fontSize: 14, color: T.inputText, padding: 0,
+                  minHeight: 80, textAlignVertical: 'top', lineHeight: 22,
+                }}
+                multiline
+                numberOfLines={4}
+                maxLength={200}
+                placeholder="e.g. Please include generic alternatives..."
+                placeholderTextColor={T.placeholder}
+                value={message}
+                onChangeText={onChange}
+                returnKeyType="done"
+              />
+            </View>
+            <Text style={{ fontSize: 10, color: T.counter, textAlign: 'right', marginBottom: 20 }}>
+              {message.length}/200
+            </Text>
+
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable
+                onPress={() => { Keyboard.dismiss(); onCancel(); }}
+                style={{
+                  flex: 1, backgroundColor: T.cancelBg,
+                  borderRadius: 18, paddingVertical: 15,
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: '700', color: T.cancelText }}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => { Keyboard.dismiss(); onNext(); }}
+                style={{
+                  flex: 2, backgroundColor: '#6C63FF',
+                  borderRadius: 18, paddingVertical: 15,
+                  alignItems: 'center', justifyContent: 'center',
+                  flexDirection: 'row', gap: 8,
+                  shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
+                }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>Next</Text>
+                <Ionicons name="arrow-forward" size={16} color="#fff" />
+              </Pressable>
+            </View>
+          </AnimatedRN.View>
+        </TouchableWithoutFeedback>
+      </Animated.View>
+    </AnimatedRN.View>
   );
 }

@@ -1,14 +1,14 @@
 import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    serverTimestamp,
+    updateDoc,
+    where,
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { DEFAULT_SHOP } from '../constants/shops';
@@ -18,12 +18,12 @@ import { Prescription, PrescriptionStatus } from '../types';
 // ─── Home screen upload flow ──────────────────────────────────────────────────
 
 export interface OrderPayload {
-  imageUri: string;
+  imageUri: string | null;  // null when user types medicine names instead of uploading
   message:  string;
   address:  string;
   phone:    string;
-  userId:   string;   // required — always pass from AuthContext
-  userName: string;   // for display in admin panel
+  userId:   string;
+  userName: string;
 }
 
 /**
@@ -35,28 +35,34 @@ export async function submitPrescriptionOrder(
   payload: OrderPayload,
   onProgress?: (pct: number) => void,
 ): Promise<string> {
-  // ── Step 1: upload image ──────────────────────────────────────────────────
-  const blob       = await uriToBlob(payload.imageUri);
-  const filename   = `prescriptions/${payload.userId}/${Date.now()}.jpg`;
-  const storageRef = ref(storage, filename);
-  const task       = uploadBytesResumable(storageRef, blob);
+  // ── Step 1: upload image (only if provided) ───────────────────────────────
+  let imageUrl = '';
+  if (payload.imageUri) {
+    const blob       = await uriToBlob(payload.imageUri);
+    const filename   = `prescriptions/${payload.userId}/${Date.now()}.jpg`;
+    const storageRef = ref(storage, filename);
+    const task       = uploadBytesResumable(storageRef, blob);
 
-  const imageUrl: string = await new Promise((resolve, reject) => {
-    task.on(
-      'state_changed',
-      (snap) => onProgress?.(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
-      reject,
-      async () => resolve(await getDownloadURL(task.snapshot.ref)),
-    );
-  });
+    imageUrl = await new Promise((resolve, reject) => {
+      task.on(
+        'state_changed',
+        (snap) => onProgress?.(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+        reject,
+        async () => resolve(await getDownloadURL(task.snapshot.ref)),
+      );
+    });
+  } else {
+    // Text-only order — no image to upload
+    onProgress?.(100);
+  }
 
   // ── Step 2: save to Firestore ─────────────────────────────────────────────
   const docRef = await addDoc(collection(db, 'prescriptions'), {
     userId:    payload.userId,
     userName:  payload.userName,
-    shopId:    DEFAULT_SHOP.id,      // Automatically assign default shop
-    shopName:  DEFAULT_SHOP.name,    // Store shop name for easy reference
-    imageUrl,
+    shopId:    DEFAULT_SHOP.id,
+    shopName:  DEFAULT_SHOP.name,
+    imageUrl:  imageUrl || null,   // null instead of empty string for text-only orders
     message:   payload.message,
     address:   payload.address,
     phone:     payload.phone,

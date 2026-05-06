@@ -3,7 +3,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View,
+    Alert, Image,
+    ScrollView, Text, TouchableOpacity, View
 } from 'react-native';
 import Animated, {
     FadeInDown,
@@ -146,7 +147,12 @@ export default function UploadPrescriptionScreen() {
           entering={FadeInDown.delay(160).duration(400)}
           className="bg-gray-50 rounded-3xl p-4 mb-6"
         >
-          <Text className="text-xs font-black text-gray-700 mb-3">💡 Tips for best results</Text>
+          <View className="flex-row items-center gap-2 mb-3">
+            <View className="w-6 h-6 bg-amber-100 rounded-lg items-center justify-center">
+              <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
+            </View>
+            <Text className="text-xs font-black text-gray-700">Tips for best results</Text>
+          </View>
           {tips.map((tip, i) => (
             <Animated.View
               key={tip.text}
@@ -163,10 +169,7 @@ export default function UploadPrescriptionScreen() {
       </ScrollView>
 
       {/* Submit button */}
-      <View
-        className="px-5"
-        style={{ paddingBottom: Platform.OS === 'ios' ? 32 : 20 }}
-      >
+      <View className="px-5">
         <Animated.View style={btnStyle}>
           <TouchableOpacity
             onPress={handleSubmit}
@@ -178,7 +181,7 @@ export default function UploadPrescriptionScreen() {
             style={imageUri ? { shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 10 } : {}}
           >
             <Text className="text-white font-bold text-sm">
-              {loading ? 'Submitting...' : 'Submit Prescription 🚀'}
+            {loading ? 'Submitting...' : 'Submit Prescription'}
             </Text>
           </TouchableOpacity>
         </Animated.View>

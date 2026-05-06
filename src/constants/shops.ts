@@ -38,12 +38,12 @@ export interface ShopConfig {
  * This is the primary pharmacy shop handling all orders
  */
 export const DEFAULT_SHOP: ShopConfig = {
-  id: 'madiccare-default',
-  name: 'MadicCare',
+  id: 'medicare-default',
+  name: 'Medicare',
   region: 'default',
   contact: '+923191796621',
   whatsapp: '+923191796621',
-  email: 'support@madiccare.com',
+  email: 'support@medicare.com',
   address: 'Pakistan',
   isActive: true,
 } as const;

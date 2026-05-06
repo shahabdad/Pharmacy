@@ -1,4 +1,5 @@
 import {
+    addDoc,
     arrayUnion,
     collection,
     doc,
@@ -7,112 +8,158 @@ import {
     onSnapshot,
     query,
     serverTimestamp,
+    Timestamp,
     updateDoc,
-    where
+    where,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { Chat, ChatMessage } from '../types';
 
+// ─── Helper: convert any timestamp value to a JS Date ────────────────────────
+export function toDate(value: any): Date {
+  if (!value) return new Date();
+  if (value instanceof Date) return value;
+  // Firestore Timestamp
+  if (typeof value?.toDate === 'function') return value.toDate();
+  // Firestore Timestamp-like { seconds, nanoseconds }
+  if (typeof value?.seconds === 'number') return new Date(value.seconds * 1000);
+  return new Date(value);
+}
+
+// ─── Helper: normalise a raw chat doc from Firestore ─────────────────────────
+function normaliseChat(id: string, data: any): Chat {
+  return {
+    ...data,
+    id,
+    createdAt: toDate(data.createdAt),
+    updatedAt: data.updatedAt ? toDate(data.updatedAt) : undefined,
+    messages: (data.messages ?? []).map((m: any) => ({
+      ...m,
+      timestamp: toDate(m.timestamp),
+    })),
+  } as Chat;
+}
+
 export const chatService = {
-  /**
-   * Send message in a chat thread
-   */
+  // ── Send a message ──────────────────────────────────────────────────────────
   async sendMessage(
     chatId: string,
     sender: 'user' | 'admin',
     senderName: string,
     message: string
-  ): Promise<ChatMessage> {
-    try {
-      const chatMessage: ChatMessage = {
-        sender,
-        senderName,
-        message,
-        timestamp: new Date(),
-      };
+  ): Promise<void> {
+    // Store timestamp as ISO string so arrayUnion can serialise it reliably
+    const chatMessage = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      sender,
+      senderName,
+      message,
+      timestamp: new Date().toISOString(),
+    };
 
-      await updateDoc(doc(db, 'chats', chatId), {
-        messages: arrayUnion(chatMessage),
-        updatedAt: serverTimestamp(),
-      });
-
-      return chatMessage;
-    } catch (error) {
-      console.error('Send message error:', error);
-      throw error;
-    }
+    await updateDoc(doc(db, 'chats', chatId), {
+      messages: arrayUnion(chatMessage),
+      updatedAt: serverTimestamp(),
+    });
   },
 
-  /**
-   * Get chat by ID
-   */
+  // ── Get a single chat ───────────────────────────────────────────────────────
   async getChat(chatId: string): Promise<Chat | null> {
-    try {
-      const docSnapshot = await getDoc(doc(db, 'chats', chatId));
-      return docSnapshot.exists() ? ({ id: docSnapshot.id, ...docSnapshot.data() } as Chat) : null;
-    } catch (error) {
-      console.error('Get chat error:', error);
-      throw error;
-    }
+    const snap = await getDoc(doc(db, 'chats', chatId));
+    if (!snap.exists()) return null;
+    return normaliseChat(snap.id, snap.data());
   },
 
-  /**
-   * Get chat by prescription ID
-   */
+  // ── Get chat by prescription ID ─────────────────────────────────────────────
   async getChatByPrescriptionId(prescriptionId: string): Promise<Chat | null> {
-    try {
-      const q = query(collection(db, 'chats'), where('prescriptionId', '==', prescriptionId));
-      const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.empty) return null;
-      
-      const doc = querySnapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as Chat;
-    } catch (error) {
-      console.error('Get chat by prescription ID error:', error);
-      throw error;
-    }
+    const q = query(collection(db, 'chats'), where('prescriptionId', '==', prescriptionId));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return normaliseChat(snap.docs[0].id, snap.docs[0].data());
   },
 
-  /**
-   * Get chat by order ID
-   */
+  // ── Get chat by order ID ────────────────────────────────────────────────────
   async getChatByOrderId(orderId: string): Promise<Chat | null> {
-    try {
-      const q = query(collection(db, 'chats'), where('orderId', '==', orderId));
-      const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.empty) return null;
-      
-      const doc = querySnapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as Chat;
-    } catch (error) {
-      console.error('Get chat by order ID error:', error);
-      throw error;
-    }
+    const q = query(collection(db, 'chats'), where('orderId', '==', orderId));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return normaliseChat(snap.docs[0].id, snap.docs[0].data());
   },
 
-  /**
-   * Get all messages from a chat
-   */
+  // ── Get all messages from a chat ────────────────────────────────────────────
   async getChatMessages(chatId: string): Promise<ChatMessage[]> {
-    try {
-      const chat = await this.getChat(chatId);
-      return chat?.messages || [];
-    } catch (error) {
-      console.error('Get chat messages error:', error);
-      throw error;
-    }
+    const chat = await this.getChat(chatId);
+    return chat?.messages ?? [];
   },
 
-  /**
-   * Listen to chat updates in real-time (modular Firebase v9+ API)
-   */
-  listenToChat(chatId: string, callback: (chat: Chat) => void) {
-    return onSnapshot(doc(db, 'chats', chatId), (snapshot) => {
-      if (snapshot.exists()) {
-        callback({ id: snapshot.id, ...snapshot.data() } as Chat);
-      }
+  // ── Real-time listener for a single chat ────────────────────────────────────
+  listenToChat(chatId: string, callback: (chat: Chat) => void): () => void {
+    return onSnapshot(doc(db, 'chats', chatId), snap => {
+      if (snap.exists()) callback(normaliseChat(snap.id, snap.data()));
+    });
+  },
+
+  // ── Get or create the user's general support chat ───────────────────────────
+  async getOrCreateUserChat(userId: string, userName: string): Promise<Chat> {
+    // Try to find existing general chat for this user
+    const q = query(
+      collection(db, 'chats'),
+      where('userId', '==', userId),
+      where('type', '==', 'general')
+    );
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      return normaliseChat(snap.docs[0].id, snap.docs[0].data());
+    }
+
+    // Create a new one
+    const now = Timestamp.now();
+    const newChat = {
+      userId,
+      userName,
+      type: 'general',
+      participants: [userId, 'admin'],
+      messages: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    const ref = await addDoc(collection(db, 'chats'), newChat);
+    return normaliseChat(ref.id, { ...newChat, createdAt: now, updatedAt: now });
+  },
+
+  // ── Get all chats for a user ────────────────────────────────────────────────
+  async getUserChats(userId: string): Promise<Chat[]> {
+    const q = query(collection(db, 'chats'), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => normaliseChat(d.id, d.data()));
+  },
+
+  // ── Real-time listener for all user chats ───────────────────────────────────
+  listenToUserChats(userId: string, callback: (chats: Chat[]) => void): () => void {
+    const q = query(collection(db, 'chats'), where('userId', '==', userId));
+    return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => normaliseChat(d.id, d.data())));
+    });
+  },
+
+  // ── Get all chats (admin) ───────────────────────────────────────────────────
+  async getAllChats(): Promise<Chat[]> {
+    const snap = await getDocs(collection(db, 'chats'));
+    return snap.docs.map(d => normaliseChat(d.id, d.data()));
+  },
+
+  // ── Real-time listener for ALL chats (admin) ────────────────────────────────
+  listenToAllChats(callback: (chats: Chat[]) => void): () => void {
+    return onSnapshot(collection(db, 'chats'), snap => {
+      const all = snap.docs.map(d => normaliseChat(d.id, d.data()));
+      // Sort by most recent activity
+      all.sort((a, b) => {
+        const aT = a.messages.length ? toDate(a.messages[a.messages.length - 1].timestamp) : toDate(a.createdAt);
+        const bT = b.messages.length ? toDate(b.messages[b.messages.length - 1].timestamp) : toDate(b.createdAt);
+        return bT.getTime() - aT.getTime();
+      });
+      callback(all);
     });
   },
 };

@@ -5,29 +5,31 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "medicare",
+    "icon": "./assets/images/Medi.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/Medi.png",
       "resizeMode": "contain",
-      "backgroundColor": "#4A90E2"
+      "backgroundColor": "#6366F1"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.medicare.app"
+      "bundleIdentifier": "com.medicare.app",
+      "icon": "./assets/images/Medi.png"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#4A90E2",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png"
+        "foregroundImage": "./assets/images/Medi.png",
+        "backgroundColor": "#6366F1"
       },
-      "package": "com.medicare.app"
+      "package": "com.medicare.app",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/Medi.png"
     },
     "plugins": [
       "expo-web-browser"
