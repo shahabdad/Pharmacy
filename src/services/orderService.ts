@@ -1,144 +1,131 @@
 import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    onSnapshot,
+    query,
+    serverTimestamp,
+    updateDoc,
+    where,
 } from 'firebase/firestore';
 import { DEFAULT_SHOP } from '../constants/shops';
 import { db } from '../firebase/config';
 import { Order, OrderItem, OrderStatus } from '../types';
 
+// ─── Normalise Firestore doc → Order ─────────────────────────────────────────
+const normalizeOrder = (id: string, data: any): Order => ({
+  ...data,
+  id,
+  createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt ?? Date.now()),
+  updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt ?? Date.now()),
+} as Order);
+
 export const orderService = {
-  /**
-   * Create a new order
-   * Automatically assigns to default shop (MadicCare) if no shopId provided
-   */
+
+  // ── Create ──────────────────────────────────────────────────────────────────
   async createOrder(
     userId: string,
-    shopId: string = DEFAULT_SHOP.id, // Default to MadicCare
+    shopId: string = DEFAULT_SHOP.id,
     items: OrderItem[],
-    totalAmount: number
+    totalAmount: number,
+    meta?: { userName?: string; userPhone?: string; userAddress?: string }
   ): Promise<Order> {
-    try {
-      const orderData = {
-        userId,
-        shopId:    shopId || DEFAULT_SHOP.id, // Fallback to default shop
-        shopName:  DEFAULT_SHOP.name,         // Store shop name for reference
-        items,
-        totalAmount,
-        status: 'pending' as OrderStatus,
-        whatsappNotified: false,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
+    const orderData = {
+      userId,
+      shopId:      shopId || DEFAULT_SHOP.id,
+      shopName:    DEFAULT_SHOP.name,
+      userName:    meta?.userName    ?? '',
+      userPhone:   meta?.userPhone   ?? '',
+      userAddress: meta?.userAddress ?? '',
+      items,
+      totalAmount,
+      status:           'pending' as OrderStatus,
+      whatsappNotified: false,
+      adminNote:        '',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
 
-      const docRef = await addDoc(collection(db, 'orders'), orderData);
+    const docRef = await addDoc(collection(db, 'orders'), orderData);
 
-      // Create associated chat
-      const chatRef = await addDoc(collection(db, 'chats'), {
-        orderId: docRef.id,
-        messages: [],
-        createdAt: serverTimestamp(),
-      });
+    // Create associated chat thread
+    const chatRef = await addDoc(collection(db, 'chats'), {
+      orderId:      docRef.id,
+      userId,
+      type:         'order',
+      participants: [userId, 'admin'],
+      messages:     [],
+      createdAt:    serverTimestamp(),
+    });
 
-      // Update order with chat ID
-      await updateDoc(docRef, { chatId: chatRef.id });
+    await updateDoc(docRef, { chatId: chatRef.id });
 
-      return {
-        id: docRef.id,
-        ...orderData,
-        chatId: chatRef.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as Order;
-    } catch (error) {
-      console.error('Create order error:', error);
-      throw error;
-    }
+    return {
+      id: docRef.id,
+      ...orderData,
+      chatId:    chatRef.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Order;
   },
 
-  /**
-   * Get all orders for a user
-   */
+  // ── Real-time: user's own orders ────────────────────────────────────────────
+  listenToUserOrders(userId: string, callback: (orders: Order[]) => void): () => void {
+    const q = query(collection(db, 'orders'), where('userId', '==', userId));
+    return onSnapshot(q, snap => {
+      const orders = snap.docs.map(d => normalizeOrder(d.id, d.data()));
+      orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      callback(orders);
+    });
+  },
+
+  // ── Real-time: all orders for a shop (admin) ────────────────────────────────
+  listenToShopOrders(shopId: string, callback: (orders: Order[]) => void): () => void {
+    const q = query(collection(db, 'orders'), where('shopId', '==', shopId));
+    return onSnapshot(q, snap => {
+      const orders = snap.docs.map(d => normalizeOrder(d.id, d.data()));
+      orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      callback(orders);
+    });
+  },
+
+  // ── Real-time: ALL orders (admin, no shop filter) ───────────────────────────
+  listenToAllOrders(callback: (orders: Order[]) => void): () => void {
+    return onSnapshot(collection(db, 'orders'), snap => {
+      const orders = snap.docs.map(d => normalizeOrder(d.id, d.data()));
+      orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      callback(orders);
+    });
+  },
+
+  // ── One-shot fetches ────────────────────────────────────────────────────────
   async getUserOrders(userId: string): Promise<Order[]> {
-    try {
-      const q = query(collection(db, 'orders'), where('userId', '==', userId));
-      const querySnapshot = await getDocs(q);
-      
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      } as Order));
-    } catch (error) {
-      console.error('Get user orders error:', error);
-      throw error;
-    }
+    const q = query(collection(db, 'orders'), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => normalizeOrder(d.id, d.data()));
   },
 
-  /**
-   * Get all orders for a shop
-   */
   async getShopOrders(shopId: string): Promise<Order[]> {
-    try {
-      const q = query(collection(db, 'orders'), where('shopId', '==', shopId));
-      const querySnapshot = await getDocs(q);
-      
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      } as Order));
-    } catch (error) {
-      console.error('Get shop orders error:', error);
-      throw error;
-    }
+    const q = query(collection(db, 'orders'), where('shopId', '==', shopId));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => normalizeOrder(d.id, d.data()));
   },
 
-  /**
-   * Get single order
-   */
   async getOrder(orderId: string): Promise<Order | null> {
-    try {
-      const docSnapshot = await getDoc(doc(db, 'orders', orderId));
-      return docSnapshot.exists()
-        ? ({ id: docSnapshot.id, ...docSnapshot.data() } as Order)
-        : null;
-    } catch (error) {
-      console.error('Get order error:', error);
-      throw error;
-    }
+    const snap = await getDoc(doc(db, 'orders', orderId));
+    return snap.exists() ? normalizeOrder(snap.id, snap.data()) : null;
   },
 
-  /**
-   * Update order status
-   */
-  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<void> {
-    try {
-      await updateDoc(doc(db, 'orders', orderId), {
-        status,
-        updatedAt: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error('Update order status error:', error);
-      throw error;
-    }
+  // ── Mutations ───────────────────────────────────────────────────────────────
+  async updateOrderStatus(orderId: string, status: OrderStatus, adminNote?: string): Promise<void> {
+    const update: any = { status, updatedAt: serverTimestamp() };
+    if (adminNote !== undefined) update.adminNote = adminNote;
+    await updateDoc(doc(db, 'orders', orderId), update);
   },
 
-  /**
-   * Mark as WhatsApp notified
-   */
   async markWhatsAppNotified(orderId: string): Promise<void> {
-    try {
-      await updateDoc(doc(db, 'orders', orderId), {
-        whatsappNotified: true,
-      });
-    } catch (error) {
-      console.error('Mark WhatsApp notified error:', error);
-      throw error;
-    }
+    await updateDoc(doc(db, 'orders', orderId), { whatsappNotified: true });
   },
 };

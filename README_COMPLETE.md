@@ -5,15 +5,16 @@
 ## 🚀 Features
 
 ### Current Features
-- ✅ **Authentication**: Email/Password login and registration
-- ✅ **User Roles**: Support for customers and shop admins
+- ✅ **Enhanced Authentication**: Tabbed login/register interface with email/password and Google OAuth
+- ✅ **User Roles**: Automatic role detection for customers and admins
 - ✅ **Prescription Upload**: Users can upload prescription images
-- ✅ **Shop Selection**: Region-based shop filtering
+- ✅ **Shop Selection**: Default shop (MadicCare) with future multi-shop support
 - ✅ **Quote System**: Admin creates quotes for prescriptions
 - ✅ **Internal Chat**: Real-time messaging between users and admins
+- ✅ **Admin Panel**: Comprehensive dashboard for prescription and order management
 - ✅ **Order Tracking**: Status updates for prescriptions/orders
-- ✅ **WhatsApp Integration**: Quick notification links
-- ✅ **Responsive UI**: Works on iOS, Android, and Web
+- ✅ **WhatsApp Integration**: Floating button for quick support
+- ✅ **Responsive UI**: Modern minimalist design with NativeWind (Tailwind CSS)
 
 ### Future Features
 - 🔄 **Product Catalog**: Direct product ordering
@@ -28,14 +29,32 @@
 ```
 MyApp/
 ├── src/
+│   ├── app/                         # Expo Router screens
+│   │   ├── (tabs)/                  # Tab navigation (user)
+│   │   │   ├── index.tsx            # Home screen
+│   │   │   ├── chat.tsx             # Chat screen
+│   │   │   ├── orders.tsx           # Orders screen
+│   │   │   ├── prescription.tsx     # Prescriptions screen
+│   │   │   ├── profile.tsx          # Profile screen
+│   │   │   └── _layout.tsx          # Tab layout
+│   │   ├── admin-dashboard.tsx      # Admin dashboard
+│   │   ├── admin-prescriptions.tsx  # Admin prescriptions management
+│   │   ├── admin-orders.tsx         # Admin orders management
+│   │   ├── admin-chats.tsx          # Admin chats list
+│   │   ├── admin-chat-detail.tsx    # Admin individual chat
+│   │   ├── signup.tsx               # Enhanced login/register screen
+│   │   ├── upload-prescription.tsx  # Prescription upload
+│   │   └── _layout.tsx              # Root layout with auth routing
 │   ├── components/
 │   │   ├── AuthButton.tsx           # Reusable button component
 │   │   ├── PrescriptionCard.tsx     # Prescription display card
 │   │   ├── OrderCard.tsx            # Order display card
-│   │   └── ChatThread.tsx           # Chat interface
+│   │   ├── ChatThread.tsx           # Chat interface
+│   │   ├── DeliveryModal.tsx        # Delivery status modal
+│   │   └── MessageModal.tsx         # Message modal
 │   ├── screens/
-│   │   ├── LoginScreen.tsx          # User login
-│   │   ├── RegisterScreen.tsx       # User registration
+│   │   ├── LoginScreen.tsx          # Legacy login component
+│   │   ├── RegisterScreen.tsx       # Legacy register component
 │   │   ├── UserDashboard.tsx        # Customer panel
 │   │   └── AdminDashboard.tsx       # Admin panel
 │   ├── services/
@@ -43,7 +62,14 @@ MyApp/
 │   │   ├── prescriptionService.ts  # Prescription management
 │   │   ├── orderService.ts         # Order management
 │   │   ├── chatService.ts          # Real-time messaging
-│   │   └── shopService.ts          # Shop management
+│   │   ├── shopService.ts          # Shop management
+│   │   └── adminService.ts         # Admin operations
+│   ├── context/
+│   │   └── AuthContext.tsx         # Auth state management
+│   ├── constants/
+│   │   ├── adminEmails.ts          # Admin email list
+│   │   ├── shops.ts                # Shop configuration
+│   │   └── theme.ts                # Theme colors
 │   ├── firebase/
 │   │   └── config.ts               # Firebase initialization
 │   ├── types/
@@ -55,6 +81,8 @@ MyApp/
 ├── app.json                         # Expo configuration
 ├── package.json                     # Dependencies
 ├── tsconfig.json                    # TypeScript config
+├── tailwind.config.js               # NativeWind configuration
+├── global.css                       # Global styles
 └── .env.example                     # Environment variables template
 ```
 
@@ -89,9 +117,24 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_id
 EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+EXPO_PUBLIC_FIREBASE_DATABASE_URL=your_database_url
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id
+EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=your_google_android_client_id
+EXPO_PUBLIC_WHATSAPP_PHONE=+923191796621
 ```
 
-### 4. Start the Development Server
+### 5. Configure Admin Emails
+
+Edit `src/constants/adminEmails.ts` to add admin email addresses:
+
+```typescript
+export const ADMIN_EMAILS = [
+  'shahabdad50@gmail.com',
+  'shhhbdad@gmail.com',
+];
+```
+
+### 6. Start the Development Server
 
 ```bash
 npm run start
@@ -104,42 +147,92 @@ Then select:
 
 ## 📱 App Walkthrough
 
+### Authentication Screen (`/signup`)
+
+**Tabbed Interface:**
+- **Sign In Tab (Default)**: Login form for returning users
+- **Register Tab**: Registration form for new users
+- **One-tap switching**: Easy navigation between modes
+- **Google OAuth**: Available in both modes
+
+**Login Mode:**
+- Email field
+- Password field
+- "Sign In" button
+- Google sign-in option
+
+**Register Mode:**
+- Full Name field
+- Email field
+- Password field
+- Confirm Password field
+- Role selector (Patient/Shop Admin)
+- "Create Account" button
+- Google sign-in option
+- Terms of Service
+
+**Auto-Routing After Login:**
+- Admin emails → `/admin-dashboard`
+- Regular users → `/(tabs)` (User Home)
+
 ### User Journey
 
 1. **Registration/Login**
-   - Create account with email and phone
-   - Select role: Customer or Admin
+   - **Tabbed interface**: Choose between "Sign In" and "Register"
+   - **Login (default)**: Email and password (2 fields)
+   - **Register**: Full name, email, password, confirm, role (5 fields)
+   - **Google OAuth**: One-tap sign-in available in both modes
+   - **Auto-routing**: Admins → Admin Dashboard, Users → User Home
 
 2. **Upload Prescription**
-   - Select shop (filtered by region)
-   - Upload prescription image
-   - Wait for admin quote
+   - Navigate to Home tab
+   - Tap "Upload Prescription" card
+   - Select prescription image from gallery or camera
+   - Automatically assigned to MadicCare shop
+   - Submit for quote
 
 3. **Review Quote**
-   - Admin sends quote with details
+   - Admin sends quote with amount and details
+   - View in Prescriptions tab
    - Chat interface for Q&A
    - Accept or reject quote
 
 4. **Track Order**
-   - View status updates
-   - Chat with admin
-   - WhatsApp notifications
+   - View status updates in Orders tab
+   - Chat with admin via Chat tab
+   - WhatsApp support button (bottom-right)
+   - Real-time status updates
 
 ### Admin Journey
 
-1. **Dashboard**
-   - View all prescriptions for their shop
-   - Filter by status
+1. **Login**
+   - Use admin email: `shahabdad50@gmail.com` or `shhhbdad@gmail.com`
+   - Automatically redirected to Admin Dashboard
 
-2. **Review & Quote**
-   - View prescription image
-   - Add medicine details if needed
-   - Set quote amount and message
+2. **Dashboard**
+   - View stats: Total prescriptions, pending, quoted, delivered
+   - Quick action buttons: Prescriptions, Orders, Chats
+   - Recent activity feed
 
-3. **Order Management**
-   - Chat with customer
-   - Update order status
-   - Send WhatsApp notifications
+3. **Prescriptions Management** (`/admin-prescriptions`)
+   - View all prescriptions with images
+   - Filter by status (pending/quoted/approved/delivered/rejected)
+   - Send quotes with amount and message
+   - Update status through workflow
+   - Real-time refresh
+
+4. **Orders Management** (`/admin-orders`)
+   - View all orders
+   - Filter by status (pending/confirmed/shipped/delivered)
+   - Update status sequentially
+   - View order items and totals
+   - Real-time refresh
+
+5. **Chat Management** (`/admin-chats`)
+   - View all customer conversations
+   - See unread counts and last messages
+   - Chat with individual customers
+   - Real-time messaging
 
 ## 🗄️ Database Structure (Firestore)
 
@@ -309,6 +402,51 @@ eas submit --platform android --latest
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [React Native TypeScript](https://react-native.dev/docs/typescript)
 - [WhatsApp Business API](https://www.whatsapp.com/business/api/)
+- [NativeWind (Tailwind CSS for React Native)](https://www.nativewind.dev/)
+
+## 📖 Project Documentation
+
+### Authentication
+- `AUTH_SCREEN_ENHANCED.md` - Enhanced authentication screen details
+- `AUTH_BEFORE_AFTER.md` - Visual comparison of authentication improvements
+- `AUTH_SYSTEM.md` - Overall authentication system architecture
+- `AUTH_FLOW_SIMPLE.md` - Authentication flow diagram
+- `QUICK_REFERENCE_AUTH_ENHANCED.md` - Quick reference guide
+
+### Features
+- `SHOP_SYSTEM.md` - Shop system and default shop logic
+- `ADMIN_PANEL.md` - Admin panel features and usage
+- `PROFILE_TAB.md` - Profile tab implementation
+- `UI_UX_GUIDE.md` - UI/UX design guidelines
+
+### Project Status
+- `PROJECT_COMPLETE.md` - Complete project overview
+- `IMPLEMENTATION_COMPLETE.md` - Implementation summary
+- `QUICK_START.md` - Quick start guide
+- `TASK_14_COMPLETE.md` - Latest enhancement (tabbed auth)
+
+## 🎨 Design System
+
+### Colors
+- **Primary**: Violet (#6C63FF)
+- **Secondary**: Red (#EF4444)
+- **Success**: Green (#10B981)
+- **Warning**: Yellow (#F59E0B)
+- **Error**: Red (#EF4444)
+
+### Typography
+- **Font Family**: System default (San Francisco on iOS, Roboto on Android)
+- **Font Weights**: Regular (400), Semibold (600), Bold (700), Black (900)
+
+### Spacing
+- **Base unit**: 4px
+- **Common spacing**: 8px, 12px, 16px, 20px, 24px
+- **Safe area**: iOS (88-90px bottom), Android (76-78px bottom)
+
+### Components
+- **Rounded corners**: 12px to 24px
+- **Shadows**: Layered system for depth
+- **Animations**: React Native Reanimated for smooth transitions
 
 ## 🤝 Contributing
 

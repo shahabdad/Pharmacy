@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    Alert, KeyboardAvoidingView, Platform,
-    ScrollView, Text, TextInput, TouchableOpacity, View,
+    Alert,
+    KeyboardAvoidingView, Platform,
+    ScrollView, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
 import Animated, {
     FadeInDown, FadeInUp
@@ -66,18 +67,22 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <View className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10" />
           <View className="absolute top-10 -left-8 w-28 h-28 rounded-full bg-white/5" />
 
-          <View className="w-14 h-14 bg-white rounded-2xl items-center justify-center mb-4"
+          <View className="w-14 h-14 bg-white rounded-2xl items-center justify-center mb-4 overflow-hidden"
             style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 6 }}
           >
-            <Ionicons name="medical" size={28} color="#6C63FF" />
+            <Image
+              source={require('../../assets/images/Medi.png')}
+              style={{ width: 48, height: 48, borderRadius: 10 }}
+              resizeMode="contain"
+            />
           </View>
-          <Text className="text-white text-3xl font-black tracking-tight">FastMadic</Text>
+          <Text className="text-white text-3xl font-black tracking-tight">Medicare</Text>
           <Text className="text-violet-200 text-sm mt-1">Medicine delivery at your doorstep</Text>
         </Animated.View>
 
         <View className="px-6 pt-8 pb-8">
           <Animated.Text entering={FadeInDown.delay(100).duration(400)} className="text-2xl font-black text-gray-900 mb-1">
-            Welcome back 👋
+            Welcome back
           </Animated.Text>
           <Animated.Text entering={FadeInDown.delay(150).duration(400)} className="text-sm text-gray-400 mb-7">
             Sign in to continue

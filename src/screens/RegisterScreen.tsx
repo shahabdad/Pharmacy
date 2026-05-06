@@ -76,7 +76,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Ionicons name="person-add" size={22} color="#6C63FF" />
           </View>
           <Text className="text-white text-2xl font-black">Create Account</Text>
-          <Text className="text-violet-200 text-xs mt-1">Join FastMadic today</Text>
+          <Text className="text-violet-200 text-xs mt-1">Join Medicare today</Text>
         </Animated.View>
 
         <View className="px-6 pt-7">

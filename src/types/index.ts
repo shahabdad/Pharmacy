@@ -25,9 +25,14 @@ export type PrescriptionStatus = 'pending' | 'quoted' | 'approved' | 'delivered'
 export interface Prescription {
   id: string;
   userId: string;
+  userName?: string;      // User's name for display
   shopId: string;
   shopName?: string;      // Shop name for easy reference (e.g., "MadicCare")
-  imageURL: string;
+  imageURL?: string;
+  imageUrl?: string;      // Alternative field name (for compatibility)
+  message?: string;       // User's message/notes
+  address?: string;       // Delivery address
+  phone?: string;         // Contact phone
   medicineList?: string[];
   status: PrescriptionStatus;
   quoteAmount?: number;
@@ -50,11 +55,15 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId: string;
+  userName?: string;      // Customer name for admin display
+  userPhone?: string;     // Customer phone for admin contact
+  userAddress?: string;   // Delivery address
   shopId: string;
   shopName?: string;      // Shop name for easy reference (e.g., "MadicCare")
   items: OrderItem[];
   totalAmount: number;
   status: OrderStatus;
+  adminNote?: string;     // Admin note / message to customer
   whatsappNotified: boolean;
   chatId?: string;
   createdAt: Date;
@@ -72,11 +81,15 @@ export interface ChatMessage {
 
 export interface Chat {
   id: string;
+  userId?: string;        // Owner user ID
+  userName?: string;      // Owner user name
+  type?: 'general' | 'prescription' | 'order'; // Chat type
   participants?: string[];
   prescriptionId?: string;
   orderId?: string;
   messages: ChatMessage[];
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 // Auth Types
