@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DEFAULT_SHOP } from '../constants/shops';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
+import { OrderSkeleton } from '../components/Skeleton';
 import { Order, OrderStatus } from '../types';
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -486,12 +487,7 @@ export default function AdminOrdersScreen() {
 
       {/* ── Content ── */}
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#6366F1" />
-          <Text style={{ fontSize: 14, color: '#94A3B8', marginTop: 12, fontWeight: '500' }}>
-            Loading orders…
-          </Text>
-        </View>
+        <OrderSkeleton />
       ) : filtered.length === 0 ? (
         <Animated.View entering={FadeInUp.delay(100).springify()} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
           <View style={{

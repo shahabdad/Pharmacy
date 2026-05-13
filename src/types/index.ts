@@ -4,9 +4,21 @@ export interface User {
   name: string;
   email: string;
   phone: string;
+  photoURL?: string;
   role: 'user' | 'admin' | 'shop-admin';
   region: string;
   createdAt: Date;
+  notificationSettings?: {
+    push: boolean;
+    email: boolean;
+    sms: boolean;
+  };
+  savedAddresses?: Array<{
+    id: string;
+    label: string;
+    address: string;
+    isDefault?: boolean;
+  }>;
 }
 
 // Shop Types
@@ -17,6 +29,20 @@ export interface Shop {
   contact: string;
   adminId: string;
   createdAt: Date;
+}
+
+// Product Types
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  description: string;
+  imageUrl?: string;
+  shopId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Prescription Types
