@@ -49,49 +49,49 @@ import { Chat, ChatMessage } from '../types';
 function makeTheme(dark: boolean) {
   return {
     // Layout
-    bg:           dark ? '#0D1117' : '#F0FDF9',
+    bg:           dark ? '#0D1117' : '#F8FAFC',
     // Sent (user)
-    sentBg:       '#0D9488',
+    sentBg:       '#004B87',
     sentText:     '#FFFFFF',
-    sentTime:     '#99F6E4',
-    sentTick:     '#5EEAD4',
+    sentTime:     '#BAE6FD',
+    sentTick:     '#0EA5E9',
     // Received (other user)
     recvBg:       dark ? '#161B22' : '#FFFFFF',
-    recvText:     dark ? '#E6EDF3' : '#134E4A',
-    recvTime:     dark ? '#6E7681' : '#5EEAD4',
-    recvBorder:   dark ? '#21262D' : '#CCFBF1',
+    recvText:     dark ? '#F0F6FC' : '#0F172A',
+    recvTime:     dark ? '#8B949E' : '#64748B',
+    recvBorder:   dark ? '#21262D' : '#F1F5F9',
     // Admin
-    adminBg:      dark ? '#134E4A' : '#0F766E',
+    adminBg:      dark ? '#0C2A44' : '#0369A1',
     adminText:    '#FFFFFF',
-    adminTime:    '#99F6E4',
+    adminTime:    '#BAE6FD',
     // Date pill
-    pillBg:       dark ? '#0D2B27' : '#CCFBF1',
-    pillText:     dark ? '#2DD4BF' : '#0F766E',
+    pillBg:       dark ? '#0C2A44' : '#E0F2FE',
+    pillText:     dark ? '#0EA5E9' : '#0369A1',
     // Input bar
     barBg:        dark ? '#0D1117' : '#FFFFFF',
-    barBorder:    dark ? '#21262D' : '#CCFBF1',
-    inputBg:      dark ? '#161B22' : '#F0FDF9',
-    inputBorder:  dark ? '#2DD4BF30' : '#99F6E4',
-    inputText:    dark ? '#E6EDF3' : '#134E4A',
-    placeholder:  dark ? '#6E7681' : '#5EEAD4',
+    barBorder:    dark ? '#21262D' : '#F1F5F9',
+    inputBg:      dark ? '#161B22' : '#F8FAFC',
+    inputBorder:  dark ? '#0EA5E920' : '#E0F2FE',
+    inputText:    dark ? '#F0F6FC' : '#0F172A',
+    placeholder:  dark ? '#8B949E' : '#94A3B8',
     // Send button
-    sendActive:   '#0D9488',
-    sendInactive: dark ? '#21262D' : '#CCFBF1',
-    sendIconOff:  dark ? '#6E7681' : '#99F6E4',
+    sendActive:   '#004B87',
+    sendInactive: dark ? '#21262D' : '#F1F5F9',
+    sendIconOff:  dark ? '#8B949E' : '#94A3B8',
     // Reply bar
-    replyBg:      dark ? '#161B22' : '#F0FDF9',
-    replyBorder:  '#0D9488',
-    replyName:    '#2DD4BF',
-    replyText:    dark ? '#8B949E' : '#5EEAD4',
+    replyBg:      dark ? '#161B22' : '#F8FAFC',
+    replyBorder:  '#004B87',
+    replyName:    '#0EA5E9',
+    replyText:    dark ? '#8B949E' : '#64748B',
     // Context menu
     menuBg:       dark ? '#161B22' : '#FFFFFF',
-    menuBorder:   dark ? '#21262D' : '#F0FDF9',
-    menuText:     dark ? '#E6EDF3' : '#134E4A',
+    menuBorder:   dark ? '#21262D' : '#F1F5F9',
+    menuText:     dark ? '#F0F6FC' : '#0F172A',
     // Sender label
-    accent:       '#2DD4BF',
-    accentAdmin:  '#34D399',
+    accent:       '#0EA5E9',
+    accentAdmin:  '#10B981',
     // Overlay
-    overlay:      'rgba(0,0,0,0.65)',
+    overlay:      'rgba(0,0,0,0.7)',
   };
 }
 
@@ -162,9 +162,9 @@ function BubbleMenu({ visible, isMine, isDark, onCopy, onReply, onDelete, onClos
   if (!visible) return null;
 
   const actions = [
-    { icon: 'copy-outline',   label: 'Copy',   color: T.menuText,  bg: isDark ? '#21262D' : '#F0FDF9' },
-    { icon: 'arrow-undo',     label: 'Reply',  color: '#2DD4BF',   bg: '#2DD4BF18' },
-    ...(isMine ? [{ icon: 'trash-outline', label: 'Delete', color: '#F87171', bg: '#F8717118' }] : []),
+    { icon: 'copy-outline',   label: 'Copy',   color: T.menuText,  bg: isDark ? '#21262D' : '#F8FAFC' },
+    { icon: 'arrow-undo',     label: 'Reply',  color: '#0EA5E9',   bg: '#0EA5E918' },
+    ...(isMine ? [{ icon: 'trash-outline', label: 'Delete', color: '#EF4444', bg: '#EF444418' }] : []),
   ];
   const fns = [onCopy, onReply, ...(isMine ? [onDelete] : [])];
 
@@ -268,27 +268,27 @@ function Bubble({ msg, idx, isLastInGroup, currentSender, isDark, onReply, onDel
       <TouchableOpacity onLongPress={() => onLongPress(msg)} activeOpacity={0.85} delayLongPress={280}>
         <View style={{
           backgroundColor: bg,
-          borderRadius: 20,
-          borderTopRightRadius: isMine ? 5 : 20,
-          borderTopLeftRadius: isMine ? 20 : 5,
-          paddingHorizontal: 14,
-          paddingTop: 10,
-          paddingBottom: 8,
+          borderRadius: 24,
+          borderTopRightRadius: isMine ? 4 : 24,
+          borderTopLeftRadius: isMine ? 24 : 4,
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: 10,
           shadowColor: isMine ? T.sentBg : '#000',
-          shadowOffset: { width: 0, height: isMine ? 5 : 2 },
-          shadowOpacity: isMine ? 0.35 : (isDark ? 0.3 : 0.07),
-          shadowRadius: isMine ? 14 : 8,
-          elevation: isMine ? 7 : 3,
-          borderWidth: !isMine && !isAdmin ? 1 : 0,
+          shadowOffset: { width: 0, height: isMine ? 4 : 2 },
+          shadowOpacity: isMine ? 0.3 : (isDark ? 0.4 : 0.05),
+          shadowRadius: isMine ? 12 : 8,
+          elevation: isMine ? 8 : 2,
+          borderWidth: !isMine && !isAdmin ? 1.5 : 0,
           borderColor: T.recvBorder,
         }}>
           {/* Quoted reply */}
           {replyData && (
             <View style={{
-              borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7,
-              marginBottom: 8, borderLeftWidth: 3,
-              backgroundColor: isMine ? 'rgba(255,255,255,0.15)' : (isDark ? '#0D2B27' : '#F0FDF9'),
-              borderLeftColor: isMine ? 'rgba(255,255,255,0.6)' : T.accent,
+              borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8,
+              marginBottom: 10, borderLeftWidth: 3.5,
+              backgroundColor: isMine ? 'rgba(255,255,255,0.12)' : (isDark ? '#0C2A44' : '#F0F9FF'),
+              borderLeftColor: isMine ? 'rgba(255,255,255,0.5)' : T.accent,
             }}>
               <Text style={{ fontSize: 10, fontWeight: '800', marginBottom: 2,
                 color: isMine ? '#99F6E4' : T.accent }}>
@@ -310,11 +310,11 @@ function Bubble({ msg, idx, isLastInGroup, currentSender, isDark, onReply, onDel
             flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 5,
             justifyContent: isMine ? 'flex-end' : 'flex-start',
           }}>
-            <Text style={{ fontSize: 10, fontWeight: '600', color: timeClr }}>
+            <Text style={{ fontSize: 10, fontWeight: '700', color: timeClr }}>
               {fmtTime(msg.timestamp)}
             </Text>
             {isMine && isLastInGroup && (
-              <Ionicons name="checkmark-done" size={13} color={tickClr} />
+              <Ionicons name="checkmark-done" size={14} color={tickClr} />
             )}
           </View>
         </View>
@@ -478,13 +478,13 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
           entering={FadeInDown.duration(280)}
           style={{
             backgroundColor: T.barBg,
-            borderTopWidth: 1, borderTopColor: T.barBorder,
-            paddingHorizontal: 12, paddingTop: 10,
-            paddingBottom: Math.max(insets.bottom, 12),
-            shadowColor: T.sendActive,
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: isDark ? 0.2 : 0.08,
-            shadowRadius: 16, elevation: 12,
+            borderTopWidth: 1.5, borderTopColor: T.barBorder,
+            paddingHorizontal: 14, paddingTop: 12,
+            paddingBottom: Math.max(insets.bottom, 14),
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -10 },
+            shadowOpacity: isDark ? 0.3 : 0.05,
+            shadowRadius: 20, elevation: 15,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10 }}>
@@ -492,9 +492,9 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
             <View style={{
               flex: 1, flexDirection: 'row', alignItems: 'flex-end',
               backgroundColor: T.inputBg,
-              borderRadius: 26, borderWidth: 1.5, borderColor: T.inputBorder,
-              paddingHorizontal: 14, paddingVertical: 10,
-              minHeight: 48, maxHeight: 120,
+              borderRadius: 28, borderWidth: 1.5, borderColor: T.inputBorder,
+              paddingHorizontal: 16, paddingVertical: 12,
+              minHeight: 52, maxHeight: 130,
             }}>
               <TouchableOpacity
                 style={{ marginRight: 8, marginBottom: 1 }}
@@ -526,23 +526,22 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
                 onPress={handleSend}
                 disabled={!canSend}
                 style={{
-                  width: 48, height: 48, borderRadius: 24,
+                  width: 52, height: 52, borderRadius: 26,
                   backgroundColor: canSend ? T.sendActive : T.sendInactive,
                   alignItems: 'center', justifyContent: 'center',
-                  ...(canSend ? {
-                    shadowColor: T.sendActive,
-                    shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: 0.5, shadowRadius: 12, elevation: 10,
-                  } : {}),
+                  shadowColor: T.sendActive,
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: canSend ? 0.35 : 0,
+                  shadowRadius: 12, elevation: 10,
                 }}
               >
                 {isLoading
                   ? <ActivityIndicator size="small" color={T.sendIconOff} />
                   : <Ionicons
                       name="send"
-                      size={20}
+                      size={22}
                       color={canSend ? '#fff' : T.sendIconOff}
-                      style={{ marginLeft: 2 }}
+                      style={{ marginLeft: 3 }}
                     />
                 }
               </TouchableOpacity>

@@ -2,12 +2,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-    Alert, ScrollView, Text, TouchableOpacity, View,
+  ActivityIndicator,
+  Alert, ScrollView, Text, TouchableOpacity, View,
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
+import { dashboardService, DashboardStats, ActivityItem } from '../services/dashboardService';
+
+function timeAgo(date: Date): string {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " years ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " months ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " days ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " hours ago";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + " minutes ago";
+  return Math.floor(seconds) + " seconds ago";
+}
 
 /**
  * Admin Dashboard Screen
@@ -21,11 +38,37 @@ export default function AdminDashboardScreen() {
   const router = useRouter();
   const { appUser, isAdmin } = useAuth();
 
+  const [dashboardStats, setDashboardStats] = React.useState<DashboardStats | null>(null);
+  const [recentActivity, setRecentActivity] = React.useState<ActivityItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
   // Redirect if not admin
   React.useEffect(() => {
     if (!isAdmin) {
       Alert.alert('Access Denied', 'You do not have admin privileges');
       router.replace('/(tabs)');
+    }
+  }, [isAdmin]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [stats, activity] = await Promise.all([
+        dashboardService.getStats(),
+        dashboardService.getRecentActivity(),
+      ]);
+      setDashboardStats(stats);
+      setRecentActivity(activity);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (isAdmin) {
+      fetchData();
     }
   }, [isAdmin]);
 
@@ -41,7 +84,7 @@ export default function AdminDashboardScreen() {
           onPress: async () => {
             try {
               await authService.logout();
-              router.replace('/signup');
+              router.replace('/auth' as any);
             } catch (error: any) {
               Alert.alert('Error', error.message || 'Failed to logout');
             }
@@ -56,17 +99,15 @@ export default function AdminDashboardScreen() {
   }
 
   const stats = [
-    { label: 'Prescriptions', value: '156', icon: 'document-text', color: '#EF4444', bg: '#FEE2E2', trend: '+12%' },
-    { label: 'Active Chats', value: '23', icon: 'chatbubbles', color: '#10B981', bg: '#D1FAE5', trend: '+5' },
-    { label: 'Orders', value: '133', icon: 'cart', color: '#F59E0B', bg: '#FEF3C7', trend: '+8%' },
-    { label: 'Revenue', value: '₨45K', icon: 'trending-up', color: '#6366F1', bg: '#E0E7FF', trend: '+15%' },
+    { label: 'Prescriptions', value: dashboardStats?.prescriptions.toString() || '0', icon: 'document-text', color: '#EF4444', bg: '#FEE2E2', trend: '+12%' },
+    { label: 'Active Chats', value: dashboardStats?.activeChats.toString() || '0', icon: 'chatbubbles', color: '#10B981', bg: '#D1FAE5', trend: '+5' },
+    { label: 'Revenue', value: `Rs. ${(dashboardStats?.revenue || 0).toLocaleString()}`, icon: 'trending-up', color: '#6366F1', bg: '#E0E7FF', trend: '+15%' },
   ];
 
   const quickActions = [
     { label: 'Prescriptions', icon: 'document-text', color: '#EF4444', route: '/admin-prescriptions' },
-    { label: 'Orders', icon: 'cart', color: '#F59E0B', route: '/admin-orders' },
     { label: 'Chats', icon: 'chatbubbles', color: '#10B981', route: '/admin-chats' },
-    { label: 'Users', icon: 'people', color: '#6366F1', route: '/users' },
+    { label: 'Users', icon: 'people', color: '#6366F1', route: '/admin-users' },
     { label: 'Inventory', icon: 'cube', color: '#8B5CF6', route: '/inventory' },
     { label: 'Reports', icon: 'stats-chart', color: '#EC4899', route: '/reports' },
   ];
@@ -157,9 +198,11 @@ export default function AdminDashboardScreen() {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (action.route === '/admin-prescriptions' || 
-                          action.route === '/admin-orders' || 
-                          action.route === '/admin-chats') {
+                      if (action.route === '/admin-prescriptions' ||
+                        action.route === '/admin-chats' ||
+                        action.route === '/admin-users' ||
+                        action.route === '/inventory' ||
+                        action.route === '/reports') {
                         router.push(action.route as any);
                       } else {
                         Alert.alert('Coming Soon', `${action.label} feature is under development`);
@@ -209,29 +252,35 @@ export default function AdminDashboardScreen() {
             </View>
 
             <View className="space-y-3">
-              {[
-                { icon: 'document-text', text: 'New prescription uploaded', time: '5 min ago', color: '#EF4444' },
-                { icon: 'cart', text: 'Order #1234 completed', time: '15 min ago', color: '#10B981' },
-                { icon: 'chatbubble', text: 'New message from user', time: '1 hour ago', color: '#F59E0B' },
-              ].map((activity, idx) => (
-                <Animated.View
-                  key={idx}
-                  entering={FadeInUp.delay(idx * 60 + 450).springify()}
-                  className="flex-row items-center gap-3 py-2"
-                >
-                  <View
-                    className="w-10 h-10 rounded-2xl items-center justify-center"
-                    style={{ backgroundColor: `${activity.color}15` }}
+              {loading ? (
+                <ActivityIndicator size="small" color="#6366F1" />
+              ) : recentActivity.length === 0 ? (
+                <Text className="text-sm text-gray-400 dark:text-[#6E7681] text-center py-4">No recent activity</Text>
+              ) : (
+                recentActivity.map((activity, idx) => (
+                  <Animated.View
+                    key={activity.id + activity.type}
+                    entering={FadeInUp.delay(idx * 60 + 450).springify()}
                   >
-                    <Ionicons name={activity.icon as any} size={18} color={activity.color} />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-semibold text-gray-900 dark:text-[#F0F6FC]">{activity.text}</Text>
-                    <Text className="text-xs text-gray-400 dark:text-[#6E7681]">{activity.time}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
-                </Animated.View>
-              ))}
+                    <TouchableOpacity
+                      onPress={() => router.push(activity.route as any)}
+                      className="flex-row items-center gap-3 py-2"
+                    >
+                      <View
+                        className="w-10 h-10 rounded-2xl items-center justify-center"
+                        style={{ backgroundColor: `${activity.color}15` }}
+                      >
+                        <Ionicons name={activity.icon as any} size={18} color={activity.color} />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="text-sm font-semibold text-gray-900 dark:text-[#F0F6FC]">{activity.text}</Text>
+                        <Text className="text-xs text-gray-400 dark:text-[#6E7681]">{timeAgo(activity.time)}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+                    </TouchableOpacity>
+                  </Animated.View>
+                ))
+              )}
             </View>
           </Animated.View>
 
@@ -259,57 +308,57 @@ export default function AdminDashboardScreen() {
           </Animated.View> */}
 
           <Animated.View
-  entering={FadeInDown.delay(500).duration(400)}
-  // Modern Dark: Using Zinc-900 with a subtle border for a "floating" effect
-  className="bg-zinc-900 border border-zinc-800 rounded-[32px] p-6"
-  style={{
-    // Shadow is now neutral and deep to avoid the "cheap" purple glow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 12,
-  }}
->
-  <View className="flex-row items-center justify-between mb-8">
-    <View className="flex-row items-center gap-3">
-      {/* Icon Container: Using a professional blue tint */}
-      <View className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl items-center justify-center">
-        <Ionicons name="shield-checkmark" size={22} color="#3B82F6" />
-      </View>
-      <View>
-        <Text className="text-white text-lg font-black tracking-tighter">
-          Admin Console
-        </Text>
-        <View className="flex-row items-center gap-1">
-          <View className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <Text className="text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
-            System Active
-          </Text>
-        </View>
-      </View>
-    </View>
-    
-    {/* Minimalist badge */}
-    <View className="bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700">
-      <Text className="text-zinc-400 text-[10px] font-bold uppercase">Root</Text>
-    </View>
-  </View>
+            entering={FadeInDown.delay(500).duration(400)}
+            // Modern Dark: Using Zinc-900 with a subtle border for a "floating" effect
+            className="bg-zinc-900 border border-zinc-800 rounded-[32px] p-6"
+            style={{
+              // Shadow is now neutral and deep to avoid the "cheap" purple glow
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.5,
+              shadowRadius: 20,
+              elevation: 12,
+            }}
+          >
+            <View className="flex-row items-center justify-between mb-8">
+              <View className="flex-row items-center gap-3">
+                {/* Icon Container: Using a professional blue tint */}
+                <View className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl items-center justify-center">
+                  <Ionicons name="shield-checkmark" size={22} color="#3B82F6" />
+                </View>
+                <View>
+                  <Text className="text-white text-lg font-black tracking-tighter">
+                    Admin Console
+                  </Text>
+                  <View className="flex-row items-center gap-1">
+                    <View className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <Text className="text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
+                      System Active
+                    </Text>
+                  </View>
+                </View>
+              </View>
 
-  <Text className="text-zinc-400 text-sm leading-6">
-    Authorized access only. You are currently operating with 
-    <Text className="text-white font-bold"> Full Administrative Privileges</Text>. 
-    Manage system architecture, user databases, and order fulfillment.
-  </Text>
+              {/* Minimalist badge */}
+              <View className="bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700">
+                <Text className="text-zinc-400 text-[10px] font-bold uppercase">Root</Text>
+              </View>
+            </View>
 
-  {/* Added a subtle divider and "Last sync" feel for extra professionalism */}
-  <View className="mt-4 pt-4 border-t border-zinc-800 flex-row justify-between items-center">
-    <Text className="text-zinc-600 text-[10px] font-medium uppercase tracking-wider">
-      Security Level: High
-    </Text>
-    <Ionicons name="finger-print" size={14} color="#3F3F46" />
-  </View>
-</Animated.View>
+            <Text className="text-zinc-400 text-sm leading-6">
+              Authorized access only. You are currently operating with
+              <Text className="text-white font-bold"> Full Administrative Privileges</Text>.
+              Manage system architecture, user databases, and order fulfillment.
+            </Text>
+
+            {/* Added a subtle divider and "Last sync" feel for extra professionalism */}
+            <View className="mt-4 pt-4 border-t border-zinc-800 flex-row justify-between items-center">
+              <Text className="text-zinc-600 text-[10px] font-medium uppercase tracking-wider">
+                Security Level: High
+              </Text>
+              <Ionicons name="finger-print" size={14} color="#3F3F46" />
+            </View>
+          </Animated.View>
         </View>
       </ScrollView>
     </View>

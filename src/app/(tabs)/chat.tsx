@@ -17,6 +17,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatThread, TypingDots } from '../../components/ChatThread';
+import { LoadingScreen } from '../../components/LoadingScreen';
+import { ChatSkeleton } from '../../components/Skeleton';
 import { useAuth } from '../../context/AuthContext';
 import { chatService } from '../../services/chatService';
 import { Chat, ChatMessage } from '../../types';
@@ -34,36 +36,36 @@ const QUICK_REPLIES = [
 function useTheme(dark: boolean) {
   return {
     // Backgrounds
-    screenBg:    dark ? '#0D1117' : '#F0FDF9',
-    headerBg:    dark ? '#0D1117' : '#0D9488',
-    chatBg:      dark ? '#0D1117' : '#F0FDF9',
+    screenBg:    dark ? '#0D1117' : '#F8FAFC',
+    headerBg:    dark ? '#0C2A44' : '#004B87',
+    chatBg:      dark ? '#0D1117' : '#F8FAFC',
 
     // Header text / icons
     headerText:  '#FFFFFF',
-    headerSub:   dark ? '#5EEAD4' : '#CCFBF1',
-    headerIcon:  dark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.2)',
+    headerSub:   dark ? '#0EA5E9' : '#BAE6FD',
+    headerIcon:  dark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.15)',
 
     // Welcome card
     cardBg:      dark ? '#161B22' : '#FFFFFF',
-    cardBorder:  dark ? '#21262D' : '#CCFBF1',
-    titleText:   dark ? '#F0FDF4' : '#134E4A',
-    subText:     dark ? '#8B949E' : '#5EEAD4',
-    labelText:   dark ? '#6E7681' : '#99F6E4',
+    cardBorder:  dark ? '#21262D' : '#F1F5F9',
+    titleText:   dark ? '#F0F6FC' : '#0F172A',
+    subText:     dark ? '#8B949E' : '#64748B',
+    labelText:   dark ? '#6E7681' : '#94A3B8',
 
     // Quick reply chips
     chipBg:      dark ? '#161B22' : '#FFFFFF',
-    chipBorder:  dark ? '#2DD4BF30' : '#99F6E4',
-    chipText:    dark ? '#2DD4BF' : '#0D9488',
-    chipIcon:    dark ? '#2DD4BF' : '#0D9488',
+    chipBorder:  dark ? '#0EA5E930' : '#E0F2FE',
+    chipText:    dark ? '#0EA5E9' : '#0369A1',
+    chipIcon:    dark ? '#0EA5E9' : '#0369A1',
 
     // Accent
-    accent:      dark ? '#2DD4BF' : '#0D9488',
-    accentGlow:  dark ? '#2DD4BF' : '#0D9488',
+    accent:      dark ? '#0EA5E9' : '#005CAB',
+    accentGlow:  dark ? '#0EA5E9' : '#0070CE',
 
     // Status
-    online:      '#34D399',
-    error:       '#F87171',
-    errorBg:     dark ? '#1C1010' : '#FEF2F2',
+    online:      '#10B981',
+    error:       '#EF4444',
+    errorBg:     dark ? '#450A0A' : '#FEF2F2',
   };
 }
 
@@ -133,21 +135,9 @@ export default function ChatScreen() {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: T.screenBg, alignItems: 'center', justifyContent: 'center', paddingTop: insets.top }}>
-        <Animated.View entering={FadeIn.duration(400)} style={{ alignItems: 'center' }}>
-          <View style={{
-            width: 72, height: 72, borderRadius: 22,
-            backgroundColor: T.accent + '20',
-            alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-            borderWidth: 1.5, borderColor: T.accent + '40',
-          }}>
-            <Ionicons name="chatbubbles" size={34} color={T.accent} />
-          </View>
-          <ActivityIndicator size="large" color={T.accent} />
-          <Text style={{ fontSize: 13, color: T.subText, marginTop: 12, fontWeight: '600', letterSpacing: 0.3 }}>
-            Connecting…
-          </Text>
-        </Animated.View>
+      <View style={{ flex: 1, backgroundColor: T.screenBg }}>
+        <View style={{ height: 100, backgroundColor: T.headerBg }} />
+        <ChatSkeleton />
       </View>
     );
   }
@@ -201,15 +191,15 @@ export default function ChatScreen() {
       }}>
         {/* Glow ring avatar */}
         <View style={{
-          width: 76, height: 76, borderRadius: 38,
-          backgroundColor: T.accent + '18',
+          width: 72, height: 72, borderRadius: 24,
+          backgroundColor: dark ? '#0C2A44' : '#F0F9FF',
           alignItems: 'center', justifyContent: 'center',
           marginBottom: 16,
-          borderWidth: 2, borderColor: T.accent + '40',
-          shadowColor: T.accent, shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.6, shadowRadius: 16, elevation: 10,
+          borderWidth: 2, borderColor: dark ? '#0EA5E930' : '#E0F2FE',
+          shadowColor: '#005CAB', shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1, shadowRadius: 10, elevation: 4,
         }}>
-          <Ionicons name="chatbubbles" size={34} color={T.accent} />
+          <Ionicons name="chatbubbles" size={32} color={T.accent} />
         </View>
 
         <Text style={{ fontSize: 20, fontWeight: '900', color: T.titleText, marginBottom: 6, textAlign: 'center', letterSpacing: -0.3 }}>
@@ -324,8 +314,8 @@ export default function ChatScreen() {
                 <Ionicons name="storefront" size={20} color="#FFFFFF" />
               </View>
               <View>
-                <Text style={{ fontSize: 15, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.2 }}>
-                  MadicCare
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#FFFFFF', letterSpacing: -0.5 }}>
+                  Health Concierge
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                   <View style={{
@@ -334,8 +324,8 @@ export default function ChatScreen() {
                     shadowColor: T.online, shadowOffset: { width: 0, height: 0 },
                     shadowOpacity: 1, shadowRadius: 4,
                   }} />
-                  <Text style={{ fontSize: 11, color: T.headerSub, fontWeight: '600' }}>
-                    Online · Pharmacy
+                  <Text style={{ fontSize: 11, color: T.headerSub, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    Available · Pharmacist
                   </Text>
                 </View>
               </View>

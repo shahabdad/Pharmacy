@@ -12,6 +12,8 @@ import {
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatThread } from '../components/ChatThread';
+import { LoadingScreen } from '../components/LoadingScreen';
+import { ChatSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { chatService } from '../services/chatService';
 import { Chat, ChatMessage } from '../types';
@@ -31,9 +33,9 @@ function TypingDots() {
         style={{
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.07,
+          shadowOpacity: 0.05,
           shadowRadius: 8,
-          elevation: 3,
+          elevation: 2,
           borderWidth: 1,
           borderColor: '#F1F5F9',
         }}
@@ -41,7 +43,7 @@ function TypingDots() {
         {[0, 1, 2].map(i => (
           <View
             key={i}
-            className="w-2 h-2 rounded-full bg-violet-400"
+            className="w-1.5 h-1.5 rounded-full bg-cyan-400"
             style={{ opacity: 0.35 + i * 0.3 }}
           />
         ))}
@@ -113,12 +115,9 @@ export default function ChatScreen() {
   // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <View className="flex-1 bg-slate-50 items-center justify-center" style={{ paddingTop: insets.top }}>
-        <View className="w-16 h-16 bg-violet-100 rounded-3xl items-center justify-center mb-4">
-          <Ionicons name="chatbubbles" size={32} color="#6366F1" />
-        </View>
-        <ActivityIndicator size="large" color="#6366F1" />
-        <Text className="text-sm text-gray-400 mt-3 font-medium">Connecting…</Text>
+      <View style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: insets.top }}>
+        <View style={{ height: 60, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }} />
+        <ChatSkeleton />
       </View>
     );
   }
@@ -134,9 +133,9 @@ export default function ChatScreen() {
         <Text className="text-sm text-gray-400 text-center mb-6">{error}</Text>
         <TouchableOpacity
           onPress={() => { setError(null); setLoading(true); }}
-          className="bg-violet-600 px-8 py-3 rounded-2xl"
+          className="bg-blue-700 px-8 py-3 rounded-2xl"
         >
-          <Text className="text-white font-bold text-sm">Retry</Text>
+          <Text className="text-white font-bold text-sm">Retry Connection</Text>
         </TouchableOpacity>
       </View>
     );
@@ -173,24 +172,24 @@ export default function ChatScreen() {
           <View className="flex-1 items-center">
             <View className="flex-row items-center gap-2">
               <View
-                className="w-8 h-8 rounded-xl bg-violet-600 items-center justify-center"
+                className="w-10 h-10 rounded-2xl bg-blue-800 items-center justify-center"
                 style={{
-                  shadowColor: '#6366F1',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 4,
+                  shadowColor: '#004B87',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 8,
                   elevation: 4,
                 }}
               >
-                <Ionicons name="storefront" size={16} color="#fff" />
+                <Ionicons name="storefront" size={18} color="#fff" />
               </View>
               <View>
-                <Text className="text-sm font-black text-gray-900 leading-tight">
-                  MadicCare Pharmacy
+                <Text className="text-[15px] font-black text-slate-900 leading-tight">
+                  Health Concierge
                 </Text>
-                <View className="flex-row items-center gap-1">
-                  <View className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <Text className="text-[10px] text-emerald-500 font-semibold">Online</Text>
+                <View className="flex-row items-center gap-1.5">
+                  <View className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <Text className="text-[10px] text-emerald-600 font-extrabold uppercase tracking-widest">Online Now</Text>
                 </View>
               </View>
             </View>
@@ -198,11 +197,11 @@ export default function ChatScreen() {
 
           {/* Call */}
           <TouchableOpacity
-            className="w-10 h-10 rounded-2xl bg-violet-50 items-center justify-center"
+            className="w-10 h-10 rounded-2xl bg-blue-50 items-center justify-center"
             onPress={() => Alert.alert('Call Pharmacy', '+923191796621')}
             hitSlop={8}
           >
-            <Ionicons name="call" size={18} color="#6366F1" />
+            <Ionicons name="call" size={18} color="#005CAB" />
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -214,22 +213,22 @@ export default function ChatScreen() {
           className="items-center pt-8 pb-4 px-6"
         >
           <View
-            className="w-20 h-20 rounded-3xl bg-violet-600 items-center justify-center mb-5"
+            className="w-20 h-20 rounded-[32px] bg-blue-800 items-center justify-center mb-6"
             style={{
-              shadowColor: '#6366F1',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.35,
-              shadowRadius: 16,
-              elevation: 10,
+              shadowColor: '#004B87',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.3,
+              shadowRadius: 20,
+              elevation: 12,
             }}
           >
             <Ionicons name="chatbubbles" size={38} color="#fff" />
           </View>
-          <Text className="text-xl font-black text-gray-900 mb-2">
-            Hi {appUser?.name?.split(' ')[0] || 'there'}
+          <Text className="text-2xl font-black text-slate-900 mb-2">
+            Hi {appUser?.name?.split(' ')[0] || 'there'} 👋
           </Text>
-          <Text className="text-sm text-gray-400 text-center leading-5 mb-6">
-            Ask us anything about your prescriptions, orders, or medicines.
+          <Text className="text-[15px] text-slate-500 text-center leading-6 mb-8 px-4">
+            Our medical specialists are here to help you with your prescriptions and orders.
           </Text>
 
           <View className="w-full">
@@ -246,18 +245,18 @@ export default function ChatScreen() {
                 <TouchableOpacity
                   key={qr.label}
                   onPress={() => handleSend(qr.label)}
-                  className="bg-white border border-violet-200 rounded-2xl px-4 py-2.5"
+                  className="bg-white border-2 border-slate-100 rounded-2xl px-5 py-3"
                   style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 6,
-                    shadowColor: '#6366F1',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.08,
-                    shadowRadius: 6,
+                    flexDirection: 'row', alignItems: 'center', gap: 8,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 10,
                     elevation: 2,
                   }}
                 >
-                  <Ionicons name={qr.icon as any} size={13} color="#6366F1" />
-                  <Text className="text-xs font-semibold text-violet-700">{qr.label}</Text>
+                  <Ionicons name={qr.icon as any} size={15} color="#005CAB" />
+                  <Text className="text-sm font-bold text-slate-700">{qr.label}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>

@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator, Alert, Image, Pressable,
     RefreshControl, ScrollView, Text, TextInput,
-    TouchableOpacity, View
+    TouchableOpacity, View, useColorScheme
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PrescriptionCardSkeleton, HomeHeaderSkeleton } from '../components/Skeleton';
 import { DEFAULT_SHOP } from '../constants/shops';
 import { useAuth } from '../context/AuthContext';
 import { prescriptionService } from '../services/prescriptionService';
@@ -15,20 +16,20 @@ import { Prescription, PrescriptionStatus } from '../types';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 const STATUS_CFG: Record<PrescriptionStatus, { label: string; color: string; bg: string; icon: string }> = {
-  pending:   { label: 'Pending',   color: '#D97706', bg: '#FEF3C7', icon: 'hourglass-outline'       },
-  quoted:    { label: 'Quoted',    color: '#2563EB', bg: '#DBEAFE', icon: 'pricetag-outline'         },
-  approved:  { label: 'Approved',  color: '#059669', bg: '#D1FAE5', icon: 'checkmark-circle-outline' },
-  delivered: { label: 'Delivered', color: '#4F46E5', bg: '#EDE9FE', icon: 'bag-check-outline'        },
-  rejected:  { label: 'Rejected',  color: '#DC2626', bg: '#FEE2E2', icon: 'close-circle-outline'    },
+  pending:   { label: 'Reviewing', icon: 'time-outline',       color: '#005CAB', bg: '#EBF5FF' },
+  quoted:    { label: 'Ready to Pay', icon: 'card-outline',     color: '#0369A1', bg: '#F0F9FF' },
+  approved:  { label: 'Approved',     icon: 'checkmark-circle', color: '#047857', bg: '#ECFDF5' },
+  delivered: { label: 'Delivered',    icon: 'cube-outline',     color: '#4338CA', bg: '#EEF2FF' },
+  rejected:  { label: 'Declined',     icon: 'alert-circle',     color: '#BE123C', bg: '#FFF1F2' },
 };
 
 const FILTERS: Array<{ label: string; value: PrescriptionStatus | 'all' }> = [
   { label: 'All',       value: 'all'       },
-  { label: 'Pending',   value: 'pending'   },
-  { label: 'Quoted',    value: 'quoted'    },
+  { label: 'Reviewing', value: 'pending'   },
+  { label: 'To Pay',    value: 'quoted'    },
   { label: 'Approved',  value: 'approved'  },
   { label: 'Delivered', value: 'delivered' },
-  { label: 'Rejected',  value: 'rejected'  },
+  { label: 'Declined',  value: 'rejected'  },
 ];
 
 // ─── Quote sheet (absolute overlay — no Modal) ───────────────────────────────
@@ -110,7 +111,7 @@ function QuoteModal({
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.iconBg, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="pricetag" size={20} color="#2563EB" />
+              <Ionicons name="card-outline" size={20} color="#005CAB" />
             </View>
             <Text style={{ fontSize: 18, fontWeight: '900', color: T.title }}>Send Quote</Text>
           </View>
@@ -128,7 +129,7 @@ function QuoteModal({
         </Text>
 
         {/* Amount */}
-        <Text style={{ fontSize: 12, fontWeight: '700', color: T.label, marginBottom: 6 }}>Quote Amount (Rs.)</Text>
+        <Text style={{ fontSize: 12, fontWeight: '700', color: T.label, marginBottom: 6 }}>Quote Amount ($)</Text>
         <View style={{
           backgroundColor: T.inputBg, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12,
           borderWidth: 1.5, borderColor: amount ? '#6366F1' : T.inputBorder, marginBottom: 14,
@@ -173,9 +174,9 @@ function QuoteModal({
             onPress={submit}
             disabled={loading}
             style={{
-              flex: 2, backgroundColor: '#2563EB', borderRadius: 14, paddingVertical: 14,
+              flex: 2, backgroundColor: '#005CAB', borderRadius: 14, paddingVertical: 14,
               alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8,
-              shadowColor: '#2563EB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6,
+              shadowColor: '#005CAB', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6,
             }}
           >
             {loading
@@ -207,7 +208,7 @@ function PrescriptionItem({
   const hasImage = !!imageUri;
 
   const statusBg = dark
-    ? { pending: '#78350F', quoted: '#1E3A5F', approved: '#064E3B', delivered: '#1E1B4B', rejected: '#450A0A' }[prescription.status]
+    ? { pending: '#0C2A44', quoted: '#082F49', approved: '#064E3B', delivered: '#1E1B4B', rejected: '#4C0519' }[prescription.status]
     : cfg.bg;
 
   const dateStr = (() => {
@@ -284,10 +285,10 @@ function PrescriptionItem({
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
               <Ionicons name="create-outline" size={14} color="#6366F1" />
               <Text style={{ fontSize: 11, fontWeight: '700', color: '#6366F1', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                Medicine List
+                Requested Items
               </Text>
             </View>
-            <Text style={{ fontSize: 13, color: dark ? '#8B949E' : '#334155', lineHeight: 20 }}>
+            <Text style={{ fontSize: 12, color: dark ? '#8B949E' : '#475569', lineHeight: 18 }}>
               {prescription.message}
             </Text>
           </View>
@@ -324,13 +325,13 @@ function PrescriptionItem({
             backgroundColor: dark ? '#1E3A5F' : '#EFF6FF', borderRadius: 14, padding: 12, marginBottom: 10,
             flexDirection: 'row', alignItems: 'center', gap: 10,
           }}>
-            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: dark ? '#1E3A5F' : '#DBEAFE', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="pricetag" size={18} color="#2563EB" />
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: dark ? '#0C2A44' : '#EBF5FF', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="card-outline" size={18} color="#005CAB" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 11, color: dark ? '#60A5FA' : '#93C5FD', fontWeight: '600' }}>Quote Amount</Text>
-              <Text style={{ fontSize: 18, fontWeight: '900', color: '#1D4ED8' }}>
-                Rs. {prescription.quoteAmount.toLocaleString()}
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#047857' }}>
+                ${prescription.quoteAmount.toLocaleString()}
               </Text>
               {prescription.adminMessage ? (
                 <Text style={{ fontSize: 12, color: '#3B82F6', marginTop: 2 }}>{prescription.adminMessage}</Text>
@@ -346,12 +347,12 @@ function PrescriptionItem({
               onPress={() => onQuote(prescription)}
               disabled={updating}
               style={{
-                flex: 1, backgroundColor: '#2563EB', borderRadius: 14, paddingVertical: 12,
+                flex: 1, backgroundColor: '#005CAB', borderRadius: 14, paddingVertical: 12,
                 alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6,
-                shadowColor: '#2563EB', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4,
+                shadowColor: '#005CAB', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4,
               }}
             >
-              <Ionicons name="pricetag-outline" size={15} color="#fff" />
+              <Ionicons name="card-outline" size={15} color="#fff" />
               <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>Send Quote</Text>
             </TouchableOpacity>
           )}
@@ -538,12 +539,9 @@ export default function AdminPrescriptionsScreen() {
 
       {/* ── Content ── */}
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#6366F1" />
-          <Text style={{ fontSize: 14, color: dark ? '#6E7681' : '#94A3B8', marginTop: 12, fontWeight: '500' }}>
-            Loading prescriptions…
-          </Text>
-        </View>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
+          {[1, 2, 3, 4].map(i => <PrescriptionCardSkeleton key={i} />)}
+        </ScrollView>
       ) : filtered.length === 0 ? (
         <Animated.View entering={FadeInUp.delay(100).springify()} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
           <View style={{

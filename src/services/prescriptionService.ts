@@ -79,6 +79,34 @@ async function uriToBlob(uri: string): Promise<Blob> {
   return res.blob();
 }
 
+// ─── Firestore Timestamp → JS Date helper ────────────────────────────────────
+/**
+ * Firestore returns timestamps as { seconds, nanoseconds } objects with a
+ * .toDate() method. Calling new Date(timestamp) on them produces "Invalid Date".
+ * This helper safely converts any timestamp shape to a real JS Date.
+ */
+function toJsDate(value: any): Date {
+  if (!value) return new Date();
+  // Firestore Timestamp object
+  if (typeof value.toDate === 'function') return value.toDate();
+  // Already a Date
+  if (value instanceof Date) return value;
+  // Plain { seconds, nanoseconds } shape (e.g. from JSON serialization)
+  if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+  // Fallback: try native Date constructor
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+function normalizePrescription(id: string, data: any): Prescription {
+  return {
+    ...data,
+    id,
+    createdAt: toJsDate(data.createdAt),
+    updatedAt: toJsDate(data.updatedAt),
+  } as Prescription;
+}
+
 // ─── Prescription CRUD ────────────────────────────────────────────────────────
 
 export const prescriptionService = {
@@ -129,18 +157,18 @@ export const prescriptionService = {
   async getUserPrescriptions(userId: string): Promise<Prescription[]> {
     const q    = query(collection(db, 'prescriptions'), where('userId', '==', userId));
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Prescription));
+    return snap.docs.map(d => normalizePrescription(d.id, d.data()));
   },
 
   async getShopPrescriptions(shopId: string): Promise<Prescription[]> {
     const q    = query(collection(db, 'prescriptions'), where('shopId', '==', shopId));
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Prescription));
+    return snap.docs.map(d => normalizePrescription(d.id, d.data()));
   },
 
   async getPrescription(id: string): Promise<Prescription | null> {
     const snap = await getDoc(doc(db, 'prescriptions', id));
-    return snap.exists() ? ({ id: snap.id, ...snap.data() } as Prescription) : null;
+    return snap.exists() ? normalizePrescription(snap.id, snap.data()!) : null;
   },
 
   async updatePrescriptionQuote(id: string, quoteAmount: number, adminMessage: string): Promise<void> {
