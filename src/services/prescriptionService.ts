@@ -18,12 +18,13 @@ import { Prescription, PrescriptionStatus } from '../types';
 // ─── Home screen upload flow ──────────────────────────────────────────────────
 
 export interface OrderPayload {
-  imageUri: string | null;  // null when user types medicine names instead of uploading
-  message:  string;
-  address:  string;
-  phone:    string;
-  userId:   string;
-  userName: string;
+  imageUri:      string | null;
+  message:       string;
+  address:       string;
+  phone:         string;
+  paymentMethod: string;
+  userId:        string;
+  userName:      string;
 }
 
 /**
@@ -63,12 +64,13 @@ export async function submitPrescriptionOrder(
     shopId:    DEFAULT_SHOP.id,
     shopName:  DEFAULT_SHOP.name,
     imageUrl:  imageUrl || null,   // null instead of empty string for text-only orders
-    message:   payload.message,
-    address:   payload.address,
-    phone:     payload.phone,
-    status:    'pending',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    message:       payload.message,
+    address:       payload.address,
+    phone:         payload.phone,
+    paymentMethod: payload.paymentMethod,
+    status:        'pending',
+    createdAt:     serverTimestamp(),
+    updatedAt:     serverTimestamp(),
   });
 
   return docRef.id;

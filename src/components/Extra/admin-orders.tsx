@@ -2,22 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Linking,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Alert,
+  Linking,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import Animated, {
-    FadeIn,
-    FadeInDown,
-    FadeInUp,
-    SlideInDown,
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+  SlideInDown,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DEFAULT_SHOP } from '../constants/shops';
@@ -30,17 +30,17 @@ import { Order, OrderStatus } from '../types';
 const STATUS_CFG: Record<OrderStatus, {
   label: string; color: string; bg: string; icon: string; next: OrderStatus | null; nextLabel: string;
 }> = {
-  pending:   { label: 'Pending',   color: '#D97706', bg: '#FEF3C7', icon: 'time-outline',              next: 'confirmed', nextLabel: 'Confirm Order'   },
-  confirmed: { label: 'Confirmed', color: '#2563EB', bg: '#DBEAFE', icon: 'checkmark-circle-outline',  next: 'shipped',   nextLabel: 'Mark Shipped'    },
-  shipped:   { label: 'Shipped',   color: '#7C3AED', bg: '#EDE9FE', icon: 'bicycle-outline',           next: 'delivered', nextLabel: 'Mark Delivered'  },
-  delivered: { label: 'Delivered', color: '#059669', bg: '#D1FAE5', icon: 'bag-check-outline',         next: null,        nextLabel: ''                },
+  pending: { label: 'Pending', color: '#D97706', bg: '#FEF3C7', icon: 'time-outline', next: 'confirmed', nextLabel: 'Confirm Order' },
+  confirmed: { label: 'Confirmed', color: '#2563EB', bg: '#DBEAFE', icon: 'checkmark-circle-outline', next: 'shipped', nextLabel: 'Mark Shipped' },
+  shipped: { label: 'Shipped', color: '#7C3AED', bg: '#EDE9FE', icon: 'bicycle-outline', next: 'delivered', nextLabel: 'Mark Delivered' },
+  delivered: { label: 'Delivered', color: '#059669', bg: '#D1FAE5', icon: 'bag-check-outline', next: null, nextLabel: '' },
 };
 
 const FILTERS: Array<{ label: string; value: OrderStatus | 'all' }> = [
-  { label: 'All',       value: 'all'       },
-  { label: 'Pending',   value: 'pending'   },
+  { label: 'All', value: 'all' },
+  { label: 'Pending', value: 'pending' },
   { label: 'Confirmed', value: 'confirmed' },
-  { label: 'Shipped',   value: 'shipped'   },
+  { label: 'Shipped', value: 'shipped' },
   { label: 'Delivered', value: 'delivered' },
 ];
 
@@ -66,21 +66,24 @@ function NoteSheet({
       style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 999,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
       }}
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, width: '100%' }} />
       </TouchableWithoutFeedback>
 
-      <TouchableWithoutFeedback onPress={() => {}}>
+      <TouchableWithoutFeedback onPress={() => { }}>
         <Animated.View
           entering={SlideInDown.springify().damping(18)}
           style={{
             backgroundColor: '#FFFFFF',
-            borderTopLeftRadius: 28, borderTopRightRadius: 28,
+            borderRadius: 28,
             padding: 24, paddingBottom: 36,
-            shadowColor: '#000', shadowOffset: { width: 0, height: -4 },
+            width: '100%', maxWidth: 520,
+            shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.12, shadowRadius: 20, elevation: 20,
           }}
         >
@@ -159,7 +162,7 @@ function OrderItem({
   onAdvance: (o: Order) => void;
   updating: boolean;
 }) {
-  const cfg  = STATUS_CFG[order.status];
+  const cfg = STATUS_CFG[order.status];
   const next = cfg.next;
 
   const dateStr = (() => {
@@ -328,9 +331,9 @@ function OrderItem({
               {updating
                 ? <ActivityIndicator size="small" color="#fff" />
                 : <>
-                    <Ionicons name="arrow-forward-circle" size={16} color="#fff" />
-                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>{cfg.nextLabel}</Text>
-                  </>
+                  <Ionicons name="arrow-forward-circle" size={16} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>{cfg.nextLabel}</Text>
+                </>
               }
             </TouchableOpacity>
           ) : (
@@ -354,11 +357,11 @@ export default function AdminOrdersScreen() {
   const router = useRouter();
   const { isAdmin } = useAuth();
 
-  const [orders,   setOrders]   = useState<Order[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [filter,   setFilter]   = useState<OrderStatus | 'all'>('all');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<OrderStatus | 'all'>('all');
   const [updating, setUpdating] = useState(false);
-  const [sheet,    setSheet]    = useState<Order | null>(null);
+  const [sheet, setSheet] = useState<Order | null>(null);
   const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -441,9 +444,9 @@ export default function AdminOrdersScreen() {
         {/* Stats row */}
         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
           {[
-            { label: 'Pending',   count: counts.pending   ?? 0, color: '#D97706', bg: '#FEF3C7' },
+            { label: 'Pending', count: counts.pending ?? 0, color: '#D97706', bg: '#FEF3C7' },
             { label: 'Confirmed', count: counts.confirmed ?? 0, color: '#2563EB', bg: '#DBEAFE' },
-            { label: 'Shipped',   count: counts.shipped   ?? 0, color: '#7C3AED', bg: '#EDE9FE' },
+            { label: 'Shipped', count: counts.shipped ?? 0, color: '#7C3AED', bg: '#EDE9FE' },
             { label: 'Delivered', count: counts.delivered ?? 0, color: '#059669', bg: '#D1FAE5' },
           ].map(s => (
             <View key={s.label} style={{ flex: 1, backgroundColor: s.bg, borderRadius: 12, padding: 8, alignItems: 'center' }}>
@@ -457,7 +460,7 @@ export default function AdminOrdersScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {FILTERS.map(f => {
             const active = filter === f.value;
-            const count  = f.value === 'all' ? orders.length : (counts[f.value] ?? 0);
+            const count = f.value === 'all' ? orders.length : (counts[f.value] ?? 0);
             return (
               <TouchableOpacity
                 key={f.value}
@@ -508,7 +511,7 @@ export default function AdminOrdersScreen() {
           contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={false} onRefresh={() => {}} tintColor="#6366F1" />
+            <RefreshControl refreshing={false} onRefresh={() => { }} tintColor="#6366F1" />
           }
         >
           {filtered.map((order, idx) => (

@@ -88,13 +88,15 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
       style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         zIndex: 1000,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
         backgroundColor: 'rgba(0,0,0,0.55)',
       }}
     >
       {/* Backdrop */}
       <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); onCancel(); }}>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, width: '100%' }} />
       </TouchableWithoutFeedback>
 
       {/* Sheet slides up with keyboard */}
@@ -104,10 +106,12 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
             entering={SlideInDown.springify().damping(18)}
             style={{
               backgroundColor: T.sheetBg,
-              borderTopLeftRadius: 32, borderTopRightRadius: 32,
+              borderRadius: 28,
+              width: '100%',
+              maxWidth: 520,
               paddingHorizontal: 20,
               paddingBottom: Platform.OS === 'ios' ? 40 : 28,
-              shadowColor: '#000', shadowOffset: { width: 0, height: -4 },
+              shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
               shadowOpacity: dark ? 0.4 : 0.1, shadowRadius: 20, elevation: 20,
             }}
           >

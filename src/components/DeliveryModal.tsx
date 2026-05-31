@@ -25,7 +25,7 @@ interface Props {
   progress?: number;
   isDark?:   boolean;
   onBack:    () => void;
-  onSubmit:  (address: string, phone: string) => void;
+  onSubmit:  (address: string, phone: string, paymentMethod: string) => void;
 }
 
 // ─── Theme (pure — no hooks) ──────────────────────────────────────────────────
@@ -65,6 +65,7 @@ export function DeliveryModal({
   const [errors,     setErrors]     = useState({ address: false, phone: false });
   const [addrFocus,  setAddrFocus]  = useState(false);
   const [phoneFocus, setPhoneFocus] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'bank'>('cod');
 
   // Keyboard offset — slides the sheet up when keyboard appears
   const keyboardOffset = useRef(new Animated.Value(0)).current;
@@ -112,7 +113,7 @@ export function DeliveryModal({
     setErrors(e);
     if (e.address || e.phone) return;
     Keyboard.dismiss();
-    onSubmit(address.trim(), phone.trim());
+    onSubmit(address.trim(), phone.trim(), paymentMethod);
   }
 
   if (!visible) return null;
@@ -124,12 +125,14 @@ export function DeliveryModal({
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: T.overlay,
         zIndex: 1000,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
       }}
     >
       {/* Backdrop tap — dismiss */}
       <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); if (!loading) onBack(); }}>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, width: '100%' }} />
       </TouchableWithoutFeedback>
 
       {/* Sheet — slides up with keyboard */}
@@ -139,12 +142,13 @@ export function DeliveryModal({
             entering={SlideInDown.springify().damping(18)}
             style={{
               backgroundColor: T.sheetBg,
-              borderTopLeftRadius: 32,
-              borderTopRightRadius: 32,
+              borderRadius: 28,
+              width: '100%',
+              maxWidth: 560,
               paddingHorizontal: 20,
               paddingBottom: Platform.OS === 'ios' ? 40 : 28,
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: -6 },
+              shadowOffset: { width: 0, height: 6 },
               shadowOpacity: T.dark ? 0.5 : 0.12,
               shadowRadius: 24,
               elevation: 24,
@@ -236,6 +240,42 @@ export function DeliveryModal({
                   Phone number is required
                 </Text>
               )}
+            </View>
+
+            {/* Payment Method */}
+            <View style={{ marginBottom: 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                <Ionicons name="card-outline" size={13} color={T.label} />
+                <Text style={{ fontSize: 11, fontWeight: '700', color: T.label, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  Payment Method
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Pressable
+                  onPress={() => setPaymentMethod('cod')}
+                  style={{
+                    flex: 1, padding: 12, borderRadius: 16, borderWidth: 2,
+                    borderColor: paymentMethod === 'cod' ? T.stepActive : T.inputBorder,
+                    backgroundColor: paymentMethod === 'cod' ? (isDark ? '#064E3B' : '#F0FDF4') : T.inputBg,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name="cash-outline" size={20} color={paymentMethod === 'cod' ? T.stepActive : T.subtitle} />
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: paymentMethod === 'cod' ? T.stepActive : T.subtitle, marginTop: 4 }}>CASH ON DELIVERY</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setPaymentMethod('bank')}
+                  style={{
+                    flex: 1, padding: 12, borderRadius: 16, borderWidth: 2,
+                    borderColor: paymentMethod === 'bank' ? T.stepActive : T.inputBorder,
+                    backgroundColor: paymentMethod === 'bank' ? (isDark ? '#064E3B' : '#F0FDF4') : T.inputBg,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name="business-outline" size={20} color={paymentMethod === 'bank' ? T.stepActive : T.subtitle} />
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: paymentMethod === 'bank' ? T.stepActive : T.subtitle, marginTop: 4 }}>BANK TRANSFER</Text>
+                </Pressable>
+              </View>
             </View>
 
             {/* Upload progress */}

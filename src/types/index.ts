@@ -64,6 +64,7 @@ export interface Prescription {
   quoteAmount?: number;
   adminMessage?: string;
   chatId?: string;
+  adminViewed?: boolean; // If admin has seen the notification for this prescription
   createdAt: Date;
   updatedAt: Date;
 }
@@ -102,6 +103,7 @@ export interface ChatMessage {
   sender: 'user' | 'admin';
   senderName: string;
   message: string;
+  status?: 'sent' | 'delivered' | 'read';
   timestamp: Date;
 }
 
@@ -135,4 +137,18 @@ export interface RegisterData {
 export interface OTPVerification {
   phone: string;
   otp: string;
+}
+
+// Notification Types
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  type: 'message' | 'prescription' | 'order' | 'system';
+  icon: any;
+  color: string;
+  route: string;
+  data?: any;
 }

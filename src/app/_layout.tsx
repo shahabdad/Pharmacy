@@ -1,87 +1,73 @@
-import { AuthProvider, useAuth } from '../context/AuthContext';
-import { Stack, router, useSegments, useRootNavigationState } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View, useColorScheme } from 'react-native';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { useColorScheme, BackHandler, ActivityIndicator, View } from 'react-native';
+import { useEffect } from 'react';
 import '../../global.css';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
-};
-
-function AppNavigation() {
-  const { firebaseUser, appUser, isAdmin, loading } = useAuth();
+function NavigationLayout() {
+  const isDark = useColorScheme() === 'dark';
   const segments = useSegments();
-  const navigationState = useRootNavigationState();
-  const colorScheme = useColorScheme();
-  const [isReady, setIsReady] = useState(false);
+  const router = useRouter();
+  const { appUser, loading } = useAuth();
 
+  // Prevent GO_BACK warning when no screens in stack (e.g., Android hardware back)
   useEffect(() => {
-    if (navigationState?.key) {
-      setIsReady(true);
-    }
-  }, [navigationState?.key]);
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      return true;
+    });
+    return () => subscription.remove();
+  }, []);
 
+  // Automatic routing redirect based on auth state and role
   useEffect(() => {
-    if (!isReady || loading) return;
-    if (firebaseUser && !appUser) return;
+    if (loading) return;
 
     const inAuthGroup = segments[0] === 'auth';
-    const inAdminRoute = segments[0]?.startsWith('admin-');
+    const isAdminScreen = segments[0] && (
+      segments[0].startsWith('admin') ||
+      segments[0] === 'reports'
+    );
 
-    if (!firebaseUser) {
-      if (!inAuthGroup) {
-        router.replace('/auth');
-      }
+    if (!appUser && !inAuthGroup) {
+      // Unauthenticated user -> redirect to sign-in page
+      router.replace('/auth');
     } else if (appUser) {
-      if (isAdmin) {
-        if (inAuthGroup || segments[0] === '(tabs)' || !segments[0]) {
+      if (appUser.role === 'admin') {
+        // Admin user -> redirect to admin dashboard if on auth screen or normal tab space
+        if (inAuthGroup || !segments[0] || segments[0] === '(tabs)') {
           router.replace('/admin-dashboard');
         }
       } else {
-        if (inAdminRoute || inAuthGroup) {
-          router.replace('/');
+        // Patient user -> redirect to home page if on auth screen or attempting to view admin screens
+        if (inAuthGroup || isAdminScreen) {
+          router.replace('/(tabs)');
         }
       }
     }
-  }, [isReady, loading, firebaseUser, appUser, isAdmin, segments]);
+  }, [appUser, segments, loading]);
 
-  if (!isReady || loading || (firebaseUser && !appUser)) {
+  if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#0D1117' : '#FFFFFF' }}>
-        <ActivityIndicator size="large" color="#004B87" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#0D1117' : '#F8FAFC' }}>
+        <ActivityIndicator size="large" color={isDark ? '#6C63FF' : '#004B87'} />
       </View>
     );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="chat" />
-        <Stack.Screen name="auth/index" />
-        <Stack.Screen name="upload-prescription" />
-        <Stack.Screen name="admin-dashboard" />
-        <Stack.Screen name="admin-prescriptions" />
-        <Stack.Screen name="admin-orders" />
-        <Stack.Screen name="admin-chats" />
-        <Stack.Screen name="admin-chat-detail" />
-        <Stack.Screen name="terms" />
-        <Stack.Screen name="privacy" />
-        <Stack.Screen name="help" />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        statusBarStyle: isDark ? 'light' : 'dark',
+      }}
+    />
   );
 }
 
-export default function RootLayout() {
+export default function Layout() {
   return (
     <AuthProvider>
-      <AppNavigation />
+      <NavigationLayout />
     </AuthProvider>
   );
 }

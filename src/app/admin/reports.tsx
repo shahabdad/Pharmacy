@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../context/AuthContext';
-import { reportService, ReportData } from '../services/reportService';
+import { useAuth } from '../../context/AuthContext';
+import { reportService, ReportData } from '../../services/reportService';
 
 const { width } = Dimensions.get('window');
 
@@ -65,7 +65,6 @@ export default function ReportsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: T.screenBg, paddingTop: insets.top }}>
-      {/* Header */}
       <View style={{ backgroundColor: T.headerBg, padding: 20, borderBottomWidth: 1, borderBottomColor: T.border }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
           <TouchableOpacity 
@@ -82,15 +81,12 @@ export default function ReportsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-        
-        {/* Summary Grid */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
           <StatCard title="Revenue" value={`Rs. ${data.summary.totalRevenue.toLocaleString()}`} icon="cash-outline" color="#10B981" bg="#D1FAE5" />
           <StatCard title="Prescriptions" value={data.summary.totalPrescriptions.toString()} icon="document-text-outline" color="#6366F1" bg="#E0E7FF" />
           <StatCard title="Users" value={data.summary.totalUsers.toString()} icon="people-outline" color="#F59E0B" bg="#FEF3C7" />
         </View>
 
-        {/* Prescription Status Bar Chart */}
         <ReportSection title="Prescription Status">
           <View style={{ gap: 12 }}>
             <ProgressBar label="Delivered" count={data.prescriptionStats.delivered} total={data.summary.totalPrescriptions} color="#10B981" />
@@ -101,7 +97,6 @@ export default function ReportsScreen() {
           </View>
         </ReportSection>
 
-        {/* User Growth Chart (Custom Simple Bar) */}
         <ReportSection title="User Growth (Last 7 Days)">
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 150, paddingBottom: 20 }}>
             {data.recentGrowth.map((day, idx) => {
@@ -121,7 +116,6 @@ export default function ReportsScreen() {
           </View>
         </ReportSection>
 
-        {/* Revenue Trend */}
         <ReportSection title="Revenue Trends">
           {data.revenueByMonth.length === 0 ? (
             <Text style={{ color: T.textSec, textAlign: 'center', padding: 20 }}>No revenue data available yet</Text>
@@ -139,7 +133,6 @@ export default function ReportsScreen() {
             </View>
           )}
         </ReportSection>
-
       </ScrollView>
     </View>
   );

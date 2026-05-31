@@ -1,0 +1,54 @@
+PHARMACY APPLICATION - MAIN INDEX OVERVIEW
+==========================================
+
+The main landing page of the application (src/app/(tabs)/index.tsx) serves as the primary hub for users to interact with the pharmacy services.
+
+ARCHITECTURE DIAGRAM
+--------------------
+
+[ USER ]
+   |
+   |-- (App Launch) --> [ Auth Check ]
+                            |
+           +----------------+----------------+
+           |                                 |
+     [ Admin User ]                   [ Regular User ]
+           |                                 |
+    (Redirect to)                      (Stay on Home)
+    /admin/index                        /(tabs)/index
+                                             |
+                                     +-------+-------+
+                                     |       |       |
+                               [ Banner ] [ Search ] [ Quick Actions ]
+                                                        |
+                                             +----------+----------+
+                                             |                     |
+                                     [ Upload Rx ]          [ Order Meds ]
+                                             |                     |
+                                     (src/app/user/...)    (Inventory Flow)
+
+
+CORE COMPONENTS & FEATURES
+--------------------------
+
+1. GREETING & PROFILE:
+   Displays a personalized greeting ("Good Morning, User!") based on the AuthContext.
+
+2. PROMO BANNER:
+   A dynamic, animated carousel showing current offers, discounts, and health tips.
+
+3. QUICK ACTIONS:
+   - "Upload Prescription": Direct entry to the prescription digitization flow.
+   - "Medicines": Browse the full pharmacy inventory.
+   - "Doctor Chat": Instant connection to the Health Concierge.
+
+4. REAL-TIME ACTIVITY:
+   Displays the latest status of the user's active prescriptions and orders directly on the home screen.
+
+5. THEME SUPPORT:
+   Full integration with system appearance (Light/Dark mode) using a curated premium color palette.
+
+
+DEVELOPER PROMPT / DESIGN PHILOSOPHY
+------------------------------------
+"Create a frictionless, high-trust healthcare experience. Use vibrant emerald and teal accents to evoke health and safety. Ensure every interaction is accompanied by subtle micro-animations to make the interface feel alive and responsive."
