@@ -5,13 +5,12 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { CONTACT_CONFIG } from '../../constants/contact';
+import { PRIMARY_BLUE } from '../../../constants/theme';
 
 const HelpSupportScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
-
-  const PRIMARY_BLUE = '#004B87';
 
   const SupportOption = ({ icon, title, subtitle, onPress, color = "blue", index }: { icon: any, title: string, subtitle: string, onPress: () => void, color?: string, index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 100 + 400).duration(500)}>
@@ -38,7 +37,7 @@ const HelpSupportScreen = () => {
         paddingTop: insets.top + 10, 
         paddingHorizontal: 20, 
         paddingBottom: 24,
-        backgroundColor: '#0F172A',
+        backgroundColor: PRIMARY_BLUE,
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
       }}>
@@ -137,3 +136,4 @@ const HelpSupportScreen = () => {
 };
 
 export default HelpSupportScreen;
+

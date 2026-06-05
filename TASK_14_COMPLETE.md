@@ -156,12 +156,12 @@ After successful login/register:
 
 ### Tab Selector Styling
 - **Container**: Gray background (#F3F4F6), rounded corners, 1.5px padding
-- **Active tab**: White background, violet text (#6C63FF), shadow
+- **Active tab**: White background, violet text (#0F172A), shadow
 - **Inactive tab**: Transparent, gray text (#9CA3AF)
 - **Smooth transitions**: Instant visual feedback
 
 ### Consistent Branding
-- Violet gradient header (#6C63FF)
+- Violet gradient header (#0F172A)
 - Medical icon in white rounded square
 - Decorative circles in background
 - Smooth animations throughout
@@ -269,3 +269,4 @@ The enhanced authentication screen successfully addresses the user's concern by 
 5. **Professional polish** with smooth animations
 
 **Status**: ✅ COMPLETE AND READY FOR USE
+

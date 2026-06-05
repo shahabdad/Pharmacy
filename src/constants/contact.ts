@@ -22,3 +22,4 @@ export const CONTACT_CONFIG = {
   // Operational Hours
   hours: '7 AM — 12 AM',
 };
+

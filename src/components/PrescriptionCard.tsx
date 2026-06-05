@@ -292,3 +292,4 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
   );
 };
 
+

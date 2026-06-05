@@ -5,13 +5,12 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { CONTACT_CONFIG } from '../../constants/contact';
+import { PRIMARY_BLUE } from '../../../constants/theme';
 
 const PrivacyPolicy = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
-
-  const PRIMARY_BLUE = '#004B87';
 
   const PolicyCard = ({ icon, title, description, index }: { icon: any, title: string, description: string, index: number }) => (
     <Animated.View 
@@ -34,7 +33,7 @@ const PrivacyPolicy = () => {
         paddingTop: insets.top + 10, 
         paddingHorizontal: 20, 
         paddingBottom: 20,
-        backgroundColor: '#0F172A',
+        backgroundColor: PRIMARY_BLUE,
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
       }}>
@@ -133,3 +132,4 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+

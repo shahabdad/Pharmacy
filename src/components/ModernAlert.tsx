@@ -158,3 +158,4 @@ export const ModernToast = ({ visible, message, type = 'success', duration = 300
     </View>
   );
 };
+

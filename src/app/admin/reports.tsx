@@ -182,3 +182,4 @@ function ProgressBar({ label, count, total, color }: any) {
         </View>
     );
 }
+

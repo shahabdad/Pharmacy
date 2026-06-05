@@ -202,3 +202,4 @@ export const prescriptionService = {
     await deleteDoc(doc(db, 'prescriptions', id));
   },
 };
+

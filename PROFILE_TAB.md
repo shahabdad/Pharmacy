@@ -120,7 +120,7 @@ Buttons: [Cancel, Log Out]
 
 **Role Colors:**
 - **Admin**: Red (#EF4444) with red badge
-- **User**: Violet (#6C63FF) with violet badge
+- **User**: Violet (#0F172A) with violet badge
 
 **Section Colors:**
 - Email: Blue (#3B82F6)
@@ -262,7 +262,7 @@ Show success message
 
 **Badge**: "User" in violet
 **Icon**: person-outline
-**Color**: Violet (#6C63FF)
+**Color**: Violet (#0F172A)
 **Background**: bg-violet-100
 
 **Features Available:**
@@ -430,3 +430,4 @@ The Profile Tab provides:
 **Status**: ✅ Complete and Ready for Production
 
 **Last Updated**: April 29, 2026
+

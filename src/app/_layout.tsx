@@ -49,7 +49,7 @@ function NavigationLayout() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#0D1117' : '#F8FAFC' }}>
-        <ActivityIndicator size="large" color={isDark ? '#6C63FF' : '#004B87'} />
+        <ActivityIndicator size="large" color={isDark ? '#0F172A' : '#004B87'} />
       </View>
     );
   }
@@ -71,3 +71,4 @@ export default function Layout() {
     </AuthProvider>
   );
 }
+

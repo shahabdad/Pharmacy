@@ -62,3 +62,4 @@ export const userService = {
     await deleteDoc(doc(db, 'users', uid));
   },
 };
+

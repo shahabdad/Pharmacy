@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { CONTACT_CONFIG } from '../../constants/contact';
+import { PRIMARY_BLUE } from '../../../constants/theme';
 
 const SECTIONS = [
   {
@@ -44,7 +45,7 @@ export default function TermsOfServiceScreen() {
         paddingTop: insets.top + 10, 
         paddingHorizontal: 20, 
         paddingBottom: 20,
-        backgroundColor: '#0F172A',
+        backgroundColor: PRIMARY_BLUE,
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
       }}>
@@ -121,3 +122,4 @@ export default function TermsOfServiceScreen() {
     </View>
   );
 }
+

@@ -100,3 +100,4 @@ const shopId = getAssignedShopId(userId, userRegion);
 **Full Documentation**: See `SHOP_SYSTEM.md`  
 **Implementation Details**: See `IMPLEMENTATION_SUMMARY.md`  
 **Code**: Check `src/constants/shops.ts`
+

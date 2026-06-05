@@ -111,3 +111,4 @@ export const dashboardService = {
     return activities.sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 10);
   }
 };
+

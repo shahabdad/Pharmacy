@@ -126,7 +126,7 @@ All other emails:
 
 ### Active Tab
 - White background
-- Violet text (#6C63FF)
+- Violet text (#0F172A)
 - Subtle shadow
 - Bold font
 
@@ -239,3 +239,4 @@ const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
 ## Summary
 The enhanced authentication screen provides a **seamless, intuitive experience** for both new and returning users. The tabbed interface makes it **immediately obvious** how to register a new account while keeping login as the default view for returning users.
+

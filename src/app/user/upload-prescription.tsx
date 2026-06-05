@@ -103,9 +103,9 @@
 //             >
 //               <View
 //                 className="w-20 h-20 bg-violet-100 rounded-3xl items-center justify-center"
-//                 style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 6 }}
+//                 style={{ shadowColor: '#0F172A', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 6 }}
 //               >
-//                 <Ionicons name="document-text-outline" size={36} color="#6C63FF" />
+//                 <Ionicons name="document-text-outline" size={36} color="#0F172A" />
 //               </View>
 //               <Text className="text-base font-black text-gray-900">Upload Prescription</Text>
 //               <Text className="text-xs text-gray-400 text-center leading-4">
@@ -124,7 +124,7 @@
 //                     <Ionicons
 //                       name={src === 'camera' ? 'camera-outline' : 'images-outline'}
 //                       size={18}
-//                       color="#6C63FF"
+//                       color="#0F172A"
 //                     />
 //                     <Text className="text-xs font-bold text-violet-600 capitalize">{src}</Text>
 //                   </TouchableOpacity>
@@ -135,7 +135,7 @@
 //             <Animated.View
 //               entering={ZoomIn.springify()}
 //               className="rounded-3xl overflow-hidden mb-5"
-//               style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 }}
+//               style={{ shadowColor: '#0F172A', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 }}
 //             >
 //               <Image source={{ uri: imageUri }} className="w-full h-52" resizeMode="cover" />
 //               <View className="bg-white px-4 py-3 flex-row items-center justify-between">
@@ -170,7 +170,7 @@
 //               className="flex-row items-center gap-3 mb-2.5"
 //             >
 //               <View className="w-7 h-7 bg-violet-100 rounded-xl items-center justify-center">
-//                 <Ionicons name={tip.icon as any} size={14} color="#6C63FF" />
+//                 <Ionicons name={tip.icon as any} size={14} color="#0F172A" />
 //               </View>
 //               <Text className="text-xs text-gray-500 flex-1">{tip.text}</Text>
 //             </Animated.View>
@@ -187,7 +187,7 @@
 //             disabled={!imageUri || loading}
 //             activeOpacity={0.9}
 //             className={`rounded-2xl py-4 items-center ${imageUri && !loading ? 'bg-violet-600' : 'bg-violet-300'}`}
-//             style={imageUri ? { shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 10 } : {}}
+//             style={imageUri ? { shadowColor: '#0F172A', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 10 } : {}}
 //           >
 //             <Text className="text-white font-bold text-sm">
 //             {loading ? 'Submitting...' : 'Submit Prescription'}
@@ -329,7 +329,7 @@ export default function UploadPrescriptionScreen() {
             // Empty State / Dropzone
             <View className="border-2 border-dashed border-violet-200 bg-violet-50/30 rounded-[28px] p-6 items-center mb-6">
               <View className="w-20 h-20 bg-violet-100 rounded-full items-center justify-center mb-4">
-                <Ionicons name="document-attach-outline" size={32} color="#6C63FF" />
+                <Ionicons name="document-attach-outline" size={32} color="#0F172A" />
               </View>
               <Text className="text-lg font-bold text-gray-900 mb-1">
                 Attach Prescription
@@ -344,7 +344,7 @@ export default function UploadPrescriptionScreen() {
                   className="flex-1 bg-white border border-gray-200 rounded-2xl py-3.5 flex-row items-center justify-center gap-2 shadow-sm"
                   activeOpacity={0.7}
                 >
-                  <Ionicons name="camera" size={20} color="#6C63FF" />
+                  <Ionicons name="camera" size={20} color="#0F172A" />
                   <Text className="text-sm font-semibold text-gray-800">Camera</Text>
                 </TouchableOpacity>
 
@@ -353,7 +353,7 @@ export default function UploadPrescriptionScreen() {
                   className="flex-1 bg-white border border-gray-200 rounded-2xl py-3.5 flex-row items-center justify-center gap-2 shadow-sm"
                   activeOpacity={0.7}
                 >
-                  <Ionicons name="image" size={20} color="#6C63FF" />
+                  <Ionicons name="image" size={20} color="#0F172A" />
                   <Text className="text-sm font-semibold text-gray-800">Gallery</Text>
                 </TouchableOpacity>
               </View>

@@ -34,9 +34,9 @@ export function Field({
         backgroundColor: dark ? '#0D1117' : '#F9FAFB',
         borderRadius: 16, paddingHorizontal: 16,
         borderWidth: 2,
-        borderColor: focused ? '#6C63FF' : (dark ? '#21262D' : 'transparent'),
+        borderColor: focused ? '#0F172A' : (dark ? '#21262D' : 'transparent'),
       }}>
-        <Ionicons name={icon as any} size={17} color={focused ? '#6C63FF' : '#9CA3AF'} />
+        <Ionicons name={icon as any} size={17} color={focused ? '#0F172A' : '#9CA3AF'} />
         <TextInput
           style={{
             flex: 1, fontSize: 14,
@@ -60,3 +60,4 @@ export function Field({
     </Animated.View>
   );
 }
+

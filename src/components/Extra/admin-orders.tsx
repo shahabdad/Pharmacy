@@ -20,11 +20,11 @@ import Animated, {
   SlideInDown,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DEFAULT_SHOP } from '../constants/shops';
-import { useAuth } from '../context/AuthContext';
-import { orderService } from '../services/orderService';
-import { OrderSkeleton } from '../components/Skeleton';
-import { Order, OrderStatus } from '../types';
+import { DEFAULT_SHOP } from '../../constants/shops';
+import { useAuth } from '../../context/AuthContext';
+import { orderService } from '../../services/orderService';
+import { OrderSkeleton } from '../../components/Skeleton';
+import { Order, OrderStatus } from '../../types';
 
 // ─── Status config ────────────────────────────────────────────────────────────
 const STATUS_CFG: Record<OrderStatus, {
@@ -537,3 +537,4 @@ export default function AdminOrdersScreen() {
     </View>
   );
 }
+

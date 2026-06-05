@@ -141,3 +141,4 @@ const orders = await orderService.getShopOrders(shopId);
 **Full Docs**: See `ADMIN_PANEL.md`  
 **Auth System**: See `AUTH_SYSTEM.md`  
 **Shop System**: See `SHOP_SYSTEM.md`
+

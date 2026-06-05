@@ -89,3 +89,4 @@ export function getAllActiveShops(): ShopConfig[] {
   // For now, return only default shop
   return [DEFAULT_SHOP];
 }
+

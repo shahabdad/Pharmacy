@@ -320,3 +320,4 @@ export default function AdminDashboardScreen() {
     </View>
   );
 }
+

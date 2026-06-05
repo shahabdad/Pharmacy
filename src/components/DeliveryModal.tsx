@@ -337,3 +337,4 @@ export function DeliveryModal({
     </AnimatedRN.View>
   );
 }
+

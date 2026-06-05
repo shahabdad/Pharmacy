@@ -30,46 +30,43 @@ import { Chat, ChatMessage } from '../types';
 // ─── Theme factory ────────────────────────────────────────────────────────────
 function makeTheme(dark: boolean) {
   return {
-    bg: dark ? '#0D1117' : '#FFFFFF',
-    // Left (Customer)
-    recvBg: dark ? '#161B22' : '#F8FAFC',
+    bg: dark ? '#0D1117' : '#F8FAFC',
+    // Left (Customer/Admin)
+    recvBg: dark ? '#161B22' : '#FFFFFF',
     recvText: dark ? '#F0F6FC' : '#1F2937',
     recvTime: dark ? '#8B949E' : '#94A3B8',
-    // Right (Admin/Self)
-    sentBg: dark ? '#312E81' : '#4F46E5',
+    // Right (Self)
+    sentBg: '#0F766E', // MediCare Teal
     sentText: '#FFFFFF',
-    sentTime: dark ? '#A5B4FC' : '#C7D2FE',
-    sentTick: '#10B981',
+    sentTime: '#CCFBF1',
+    sentTick: '#34D399',
     // Date pill
-    pillBg: dark ? '#21262D' : '#F1F5F9',
-    pillText: dark ? '#8B949E' : '#64748B',
+    pillBg: dark ? '#21262D' : '#E2E8F0',
+    pillText: dark ? '#8B949E' : '#475569',
     // Input bar
-    barBg: dark ? '#0D1117' : '#FFFFFF',
-    barBorder: dark ? '#21262D' : '#F1F5F9',
-    inputBg: dark ? '#161B22' : '#F8FAFC',
-    inputText: dark ? '#F0F6FC' : '#1F2937',
+    barBg: dark ? '#161B22' : '#FFFFFF',
+    barBorder: dark ? '#30363D' : '#E5E7EB',
+    inputBg: dark ? '#0D1117' : '#F1F5F9',
+    inputText: dark ? '#F0F6FC' : '#111827',
     placeholder: '#94A3B8',
     // Icons
-    accent: '#4F46E5',
-    overlay: 'rgba(0,0,0,0.6)',
-    menuBg: dark ? '#161B22' : '#FFFFFF',
-    menuText: dark ? '#F0F6FC' : '#1F2937',
-    menuBorder: dark ? '#30363D' : '#E2E8F0',
+    accent: '#0F766E',
     // Buttons
-    sendActive: '#4F46E5',
-    sendInactive: dark ? '#21262D' : '#F1F5F9',
-    sendIconOff: '#94A3B8',
+    sendActive: '#0F766E',
+    sendInactive: dark ? '#21262D' : '#E2E8F0',
   };
 }
 
 interface ChatThreadProps {
   chat: Chat;
   currentSender: 'user' | 'admin';
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, replyTo?: ChatMessage) => void;
   isLoading?: boolean;
   isDark?: boolean;
   prefillText?: string;
   onPrefillConsumed?: () => void;
+  headerContent?: React.ReactNode;
+  bottomOffset?: number;
 }
 
 function fmtTime(raw: any): string {
@@ -109,61 +106,58 @@ function Bubble({ msg, currentSender, isDark }: { msg: ChatMessage; currentSende
 
   return (
     <Animated.View
-      entering={(isMine ? FadeInRight : FadeInLeft).springify()}
+      entering={(isMine ? FadeInRight : FadeInLeft).duration(400).springify()}
       style={{
         alignSelf: isMine ? 'flex-end' : 'flex-start',
-        maxWidth: '85%',
-        marginBottom: 6,
+        maxWidth: '82%',
+        marginBottom: 12,
       }}
     >
       <View style={{
         backgroundColor: isMine ? T.sentBg : T.recvBg,
-        paddingHorizontal: 12,
-        paddingTop: 8,
-        paddingBottom: 4,
-        borderRadius: 18,
-        borderBottomRightRadius: isMine ? 4 : 18,
-        borderBottomLeftRadius: isMine ? 18 : 4,
+        paddingHorizontal: 16,
+        paddingTop: 10,
+        paddingBottom: 6,
+        borderRadius: 20,
+        borderBottomRightRadius: isMine ? 4 : 20,
+        borderBottomLeftRadius: isMine ? 20 : 4,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
+        shadowRadius: 5,
+        elevation: 2,
+        borderWidth: isMine ? 0 : 1,
+        borderColor: T.barBorder,
       }}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <Text style={{ 
+            fontSize: 15, 
+            lineHeight: 22, 
+            color: isMine ? T.sentText : T.recvText,
+            marginBottom: 4
+        }}>
+            {msg.message}
+        </Text>
+        
+        <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            justifyContent: 'flex-end',
+            gap: 4 
+        }}>
             <Text style={{ 
-                fontSize: 15, 
-                lineHeight: 20, 
-                color: isMine ? T.sentText : T.recvText,
-                paddingRight: 60, // Space for time and status
-                marginBottom: 4
+                fontSize: 10, 
+                fontWeight: '700', 
+                color: isMine ? T.sentTime : T.recvTime 
             }}>
-                {msg.message}
+                {fmtTime(msg.timestamp)}
             </Text>
-            
-            <View style={{ 
-                position: 'absolute', 
-                right: 0, 
-                bottom: 4, 
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                gap: 3 
-            }}>
-                <Text style={{ 
-                    fontSize: 10, 
-                    fontWeight: '600', 
-                    color: isMine ? T.sentTime : T.recvTime 
-                }}>
-                    {fmtTime(msg.timestamp)}
-                </Text>
-                {isMine && (
-                    <Ionicons 
-                        name={msg.status === 'read' ? 'checkmark-done' : 'checkmark'} 
-                        size={14} 
-                        color={msg.status === 'read' ? '#10B981' : T.sentTime} 
-                    />
-                )}
-            </View>
+            {isMine && (
+                <Ionicons 
+                    name={msg.status === 'read' ? 'checkmark-done' : 'checkmark'} 
+                    size={14} 
+                    color={msg.status === 'read' ? T.sentTick : T.sentTime} 
+                />
+            )}
         </View>
       </View>
     </Animated.View>
@@ -171,7 +165,7 @@ function Bubble({ msg, currentSender, isDark }: { msg: ChatMessage; currentSende
 }
 
 export const ChatThread: React.FC<ChatThreadProps> = ({
-  chat, currentSender, onSendMessage, isLoading, isDark = false, prefillText, onPrefillConsumed
+  chat, currentSender, onSendMessage, isLoading, isDark = false, prefillText, onPrefillConsumed, headerContent, bottomOffset = 0
 }) => {
   const T = makeTheme(isDark);
   const insets = useSafeAreaInsets();
@@ -204,18 +198,24 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: T.bg }}>
+    <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        style={{ flex: 1, backgroundColor: T.bg }}
+    >
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+        contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+        showsVerticalScrollIndicator={false}
       >
+        {headerContent}
         {groups.map(g => (
           <View key={g.key}>
-            <View style={{ alignItems: 'center', marginVertical: 20 }}>
-              <View style={{ backgroundColor: T.pillBg, px: 12, py: 4, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4 }}>
-                <Text style={{ fontSize: 10, fontWeight: '800', color: T.pillText, textTransform: 'uppercase' }}>{g.label}</Text>
+            <View style={{ alignItems: 'center', marginVertical: 24 }}>
+              <View style={{ backgroundColor: T.pillBg, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 5 }}>
+                <Text style={{ fontSize: 10, fontWeight: '900', color: T.pillText, textTransform: 'uppercase', letterSpacing: 1 }}>{g.label}</Text>
               </View>
             </View>
             {g.messages.map((m, i) => <Bubble key={i} msg={m} currentSender={currentSender} isDark={isDark} />)}
@@ -223,51 +223,73 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
         ))}
       </ScrollView>
 
+      {/* Input Bar */}
       <View style={{ 
           paddingHorizontal: 16, 
           paddingTop: 12, 
-          paddingBottom: Math.max(insets.bottom, 16),
+          paddingBottom: Math.max(insets.bottom, 12) + bottomOffset,
           borderTopWidth: 1,
           borderTopColor: T.barBorder,
           backgroundColor: T.barBg,
           flexDirection: 'row',
           alignItems: 'flex-end',
-          gap: 12
+          gap: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.03,
+          shadowRadius: 10,
+          elevation: 10,
       }}>
         <View style={{ 
             flex: 1, 
             backgroundColor: T.inputBg, 
             borderRadius: 24, 
-            paddingHorizontal: 16, 
-            paddingVertical: 10,
+            paddingHorizontal: 18, 
+            paddingVertical: 12,
             maxHeight: 120,
             borderWidth: 1,
-            borderColor: T.barBorder
+            borderColor: T.barBorder,
+            flexDirection: 'row',
+            alignItems: 'flex-end'
         }}>
             <TextInput
-                placeholder="Type a response..."
+                placeholder="Type your message..."
                 placeholderTextColor={T.placeholder}
                 value={text}
                 onChangeText={setText}
                 multiline
-                style={{ fontSize: 15, color: T.inputText, padding: 0 }}
+                style={{ flex: 1, fontSize: 15, color: T.inputText, padding: 0, paddingTop: 0, textAlignVertical: 'bottom' }}
             />
+            <TouchableOpacity style={{ marginBottom: 2 }}>
+                <Ionicons name="happy-outline" size={22} color={T.placeholder} />
+            </TouchableOpacity>
         </View>
+        
         <TouchableOpacity 
             onPress={handleSend}
             disabled={!text.trim() || isLoading}
             style={{ 
-                width: 48, 
-                height: 48, 
-                borderRadius: 24, 
+                width: 52, 
+                height: 52, 
+                borderRadius: 26, 
                 backgroundColor: text.trim() ? T.sendActive : T.sendInactive,
-                items: 'center', justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center', 
+                justifyContent: 'center',
+                shadowColor: T.sendActive,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: text.trim() ? 0.3 : 0,
+                shadowRadius: 10,
+                elevation: text.trim() ? 6 : 0,
             }}
         >
-            {isLoading ? <ActivityIndicator size="small" color="#FFF" /> : <Ionicons name="send" size={20} color="#FFF" style={{ marginLeft: 3 }} />}
+            {isLoading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+            ) : (
+                <Ionicons name="send" size={22} color="#FFF" style={{ marginLeft: 3 }} />
+            )}
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
+

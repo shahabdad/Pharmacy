@@ -27,7 +27,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
   }));
 
   return (
-    <Animated.View style={[animStyle, { shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 6 }]}>
+    <Animated.View style={[animStyle, { shadowColor: '#0F172A', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 6 }]}>
       <TouchableOpacity
         activeOpacity={0.9}
         onPressIn={() => { scale.value = withSpring(0.97); }}
@@ -90,3 +90,4 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
     </Animated.View>
   );
 };
+

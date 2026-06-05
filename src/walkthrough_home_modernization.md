@@ -17,3 +17,4 @@ The Home screen now mirrors the modern aesthetics of the admin dashboard, featur
 - Consistent dark‑mode styling throughout.
 
 You can refresh the app in Expo Go to see the updated UI.
+

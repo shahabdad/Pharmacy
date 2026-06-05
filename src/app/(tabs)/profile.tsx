@@ -637,7 +637,7 @@ function NotifyToggle({ icon, title, subtitle, value, onValueChange }: { icon: s
   );
 }
 
-function SettingItem({ icon, label, right, onPress, accent = '#6C63FF', index = 0 }: { icon: string; label: string; right?: React.ReactNode; onPress?: () => void; accent?: string; index?: number }) {
+function SettingItem({ icon, label, right, onPress, accent = '#0F172A', index = 0 }: { icon: string; label: string; right?: React.ReactNode; onPress?: () => void; accent?: string; index?: number }) {
   return (
     <Animated.View entering={FadeInDown.delay(700 + (index * 50)).duration(400)}>
       <TouchableOpacity
@@ -654,3 +654,4 @@ function SettingItem({ icon, label, right, onPress, accent = '#6C63FF', index = 
     </Animated.View>
   );
 }
+

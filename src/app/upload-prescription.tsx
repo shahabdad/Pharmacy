@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert, Image,
+    ActivityIndicator,
+    Alert,
     ScrollView, Text, TouchableOpacity, View
 } from 'react-native';
 import Animated, {
@@ -13,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { submitPrescriptionOrder } from '../services/prescriptionService';
+import { useAuth } from '../context/AuthContext';
 
 const tips = [
   { icon: 'sunny-outline',    text: 'Good lighting, avoid shadows'       },
@@ -23,6 +26,7 @@ const tips = [
 
 export default function UploadPrescriptionScreen() {
   const insets   = useSafeAreaInsets();
+  const { appUser } = useAuth();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading,  setLoading]  = useState(false);
 
@@ -48,9 +52,22 @@ export default function UploadPrescriptionScreen() {
       Alert.alert('No image', 'Please select a prescription image first.');
       return;
     }
+    if (!appUser) {
+      Alert.alert('Authentication Required', 'Please log in to submit a prescription.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await submitPrescriptionOrder({ imageUri, message: '', address: '', phone: '' });
+      await submitPrescriptionOrder({ 
+        imageUri, 
+        message: '', 
+        address: appUser.region || '', 
+        phone: appUser.phone || '',
+        paymentMethod: 'Cash on Delivery',
+        userId: appUser.uid,
+        userName: appUser.name || 'User'
+      });
       Alert.alert('Success', 'Prescription submitted successfully!');
       router.replace('/(tabs)/prescription');
     } catch {
@@ -209,6 +226,7 @@ export default function UploadPrescriptionScreen() {
     </View>
   );
 }
+
 
 
 

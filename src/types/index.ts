@@ -152,3 +152,4 @@ export interface Notification {
   route: string;
   data?: any;
 }
+

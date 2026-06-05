@@ -99,7 +99,7 @@ export default function HomeScreen() {
 
   // --- Theme Config (Professional US-Based Palette) ---
   const theme = useMemo(() => ({
-    primaryBlue: '#0056B3', // Slightly deeper, more corporate blue
+    primaryBlue: '#0F172A', // Slightly deeper, more corporate blue
     accentCyan: '#00B8D4',
     bg: isDark ? '#121212' : '#F4F7F9', // Very light grey-blue background for modern feel
     cardBg: isDark ? '#1E1E1E' : '#FFFFFF',
@@ -798,3 +798,4 @@ const getStyles = (theme: any, insets: any, isDark: boolean) => StyleSheet.creat
     fontSize: 17,
   },
 });
+

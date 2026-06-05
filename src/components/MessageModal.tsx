@@ -124,7 +124,7 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
 
             {/* Step dots */}
             <View style={{ flexDirection: 'row', gap: 6, marginBottom: 20 }}>
-              <View style={{ height: 5, width: 48, borderRadius: 3, backgroundColor: '#6C63FF' }} />
+              <View style={{ height: 5, width: 48, borderRadius: 3, backgroundColor: '#0F172A' }} />
               <View style={{ height: 5, width: 20, borderRadius: 3, backgroundColor: T.stepDot }} />
             </View>
 
@@ -142,7 +142,7 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
               backgroundColor: T.inputBg, borderRadius: 16,
               paddingHorizontal: 14, paddingVertical: 12,
               borderWidth: 1.5,
-              borderColor: message.length > 0 ? '#6C63FF' : T.inputBorder,
+              borderColor: message.length > 0 ? '#0F172A' : T.inputBorder,
               marginBottom: 6,
             }}>
               <TextInput
@@ -178,11 +178,11 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
               <Pressable
                 onPress={() => { Keyboard.dismiss(); onNext(); }}
                 style={{
-                  flex: 2, backgroundColor: '#6C63FF',
+                  flex: 2, backgroundColor: '#0F172A',
                   borderRadius: 18, paddingVertical: 15,
                   alignItems: 'center', justifyContent: 'center',
                   flexDirection: 'row', gap: 8,
-                  shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 },
+                  shadowColor: '#0F172A', shadowOffset: { width: 0, height: 6 },
                   shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
                 }}
               >
@@ -196,3 +196,4 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
     </AnimatedRN.View>
   );
 }
+

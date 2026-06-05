@@ -7,6 +7,7 @@ import {
     ScrollView,
     Text,
     TouchableOpacity,
+    useColorScheme,
     View,
 } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -55,6 +56,8 @@ function TypingDots() {
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const scheme = useColorScheme();
+  const dark   = scheme === 'dark';
   const { appUser } = useAuth();
 
   const [chat,    setChat]    = useState<Chat | null>(null);
@@ -62,6 +65,16 @@ export default function ChatScreen() {
   const [sending, setSending] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
   const [typing,  setTyping]  = useState(false);
+
+  // ── Theme colors ───────────────────────────────────────────────────────────
+  const T = {
+    bg: dark ? '#0D1117' : '#F8FAFC',
+    header: dark ? '#161B22' : '#FFFFFF',
+    text: dark ? '#F0F6FC' : '#111827',
+    subText: dark ? '#8B949E' : '#64748B',
+    border: dark ? '#30363D' : '#E5E7EB',
+    accent: '#0F766E',
+  };
 
   useEffect(() => {
     if (!appUser) return;
@@ -87,24 +100,12 @@ export default function ChatScreen() {
     if (!message.trim() || !chat || !appUser || sending) return;
     setSending(true);
 
-    const optimistic: ChatMessage = {
-      id: `opt-${Date.now()}`,
-      sender: 'user',
-      senderName: appUser.name || 'You',
-      message,
-      timestamp: new Date(),
-    };
-    setChat(prev => prev ? { ...prev, messages: [...prev.messages, optimistic] } : prev);
-
     try {
       await chatService.sendMessage(chat.id, 'user', appUser.name || 'User', message);
       setTyping(true);
       setTimeout(() => setTyping(false), 2500);
     } catch (e: any) {
       Alert.alert('Send failed', e?.message || 'Please try again');
-      setChat(prev =>
-        prev ? { ...prev, messages: prev.messages.filter(m => m.id !== optimistic.id) } : prev
-      );
     } finally {
       setSending(false);
     }
@@ -112,168 +113,103 @@ export default function ChatScreen() {
 
   const hasMessages = (chat?.messages?.length ?? 0) > 0;
 
-  // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#F8FAFC', paddingTop: insets.top }}>
-        <View style={{ height: 60, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }} />
+      <View style={{ flex: 1, backgroundColor: T.bg, paddingTop: insets.top }}>
+        <View style={{ height: 60, backgroundColor: T.header, borderBottomWidth: 1, borderBottomColor: T.border }} />
         <ChatSkeleton />
       </View>
     );
   }
 
-  // ── Error ───────────────────────────────────────────────────────────────────
-  if (error) {
-    return (
-      <View className="flex-1 bg-slate-50 items-center justify-center px-8" style={{ paddingTop: insets.top }}>
-        <View className="w-16 h-16 bg-red-100 rounded-3xl items-center justify-center mb-4">
-          <Ionicons name="wifi-outline" size={32} color="#EF4444" />
-        </View>
-        <Text className="text-base font-bold text-gray-900 mb-2 text-center">Connection Error</Text>
-        <Text className="text-sm text-gray-400 text-center mb-6">{error}</Text>
-        <TouchableOpacity
-          onPress={() => { setError(null); setLoading(true); }}
-          className="bg-blue-700 px-8 py-3 rounded-2xl"
-        >
-          <Text className="text-white font-bold text-sm">Retry Connection</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // ── Main UI ─────────────────────────────────────────────────────────────────
   return (
-    <View className="flex-1 bg-slate-50" style={{ paddingTop: insets.top }}>
-
-      {/* ── Top bar: back arrow left, pharmacy name center, call right ── */}
-      <Animated.View
-        entering={FadeInDown.duration(350)}
-        className="bg-white px-4 pb-3"
+    <View style={{ flex: 1, backgroundColor: T.bg }}>
+      {/* ── Top Bar ── */}
+      <View
         style={{
-          paddingTop: insets.top > 0 ? 8 : 14,
+          backgroundColor: T.header,
+          paddingTop: insets.top + 8,
+          paddingBottom: 14,
+          paddingHorizontal: 20,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: T.border,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.07,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.03,
           shadowRadius: 10,
-          elevation: 5,
+          elevation: 4,
+          zIndex: 10,
         }}
       >
-        <View className="flex-row items-center">
-          {/* Back */}
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-10 h-10 rounded-2xl bg-slate-100 items-center justify-center"
-            hitSlop={8}
-          >
-            <Ionicons name="arrow-back" size={22} color="#1F2937" />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{
+            width: 40, height: 40, borderRadius: 12,
+            backgroundColor: dark ? '#21262D' : '#F1F5F9',
+            alignItems: 'center', justifyContent: 'center',
+          }}
+          hitSlop={8}
+        >
+          <Ionicons name="arrow-back" size={22} color={T.text} />
+        </TouchableOpacity>
 
-          {/* Center: avatar + name + status */}
-          <View className="flex-1 items-center">
-            <View className="flex-row items-center gap-2">
-              <View
-                className="w-10 h-10 rounded-2xl bg-blue-800 items-center justify-center"
-                style={{
-                  shadowColor: '#004B87',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 8,
-                  elevation: 4,
-                }}
-              >
-                <Ionicons name="storefront" size={18} color="#fff" />
-              </View>
-              <View>
-                <Text className="text-[15px] font-black text-slate-900 leading-tight">
-                  Health Concierge
+        <View style={{ flex: 1, alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{
+              width: 38, height: 38, borderRadius: 12,
+              backgroundColor: T.accent,
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Ionicons name="storefront" size={20} color="#fff" />
+            </View>
+            <View>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: T.text, letterSpacing: -0.5 }}>
+                Health Concierge
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' }} />
+                <Text style={{ fontSize: 10, color: '#10B981', fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  Active Support
                 </Text>
-                <View className="flex-row items-center gap-1.5">
-                  <View className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <Text className="text-[10px] text-emerald-600 font-extrabold uppercase tracking-widest">Online Now</Text>
-                </View>
               </View>
             </View>
           </View>
-
-          {/* Call */}
-          <TouchableOpacity
-            className="w-10 h-10 rounded-2xl bg-blue-50 items-center justify-center"
-            onPress={() => Alert.alert('Call Pharmacy', '+923191796621')}
-            hitSlop={8}
-          >
-            <Ionicons name="call" size={18} color="#005CAB" />
-          </TouchableOpacity>
         </View>
-      </Animated.View>
 
-      {/* ── Welcome + quick replies (empty state) ── */}
-      {!hasMessages && (
-        <Animated.View
-          entering={FadeInUp.delay(150).springify()}
-          className="items-center pt-8 pb-4 px-6"
+        <TouchableOpacity
+          style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#25D366' + '22', alignItems: 'center', justifyContent: 'center' }}
+          onPress={() => Alert.alert('Call Pharmacy', '+923191796621')}
         >
-          <View
-            className="w-20 h-20 rounded-[32px] bg-blue-800 items-center justify-center mb-6"
-            style={{
-              shadowColor: '#004B87',
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.3,
-              shadowRadius: 20,
-              elevation: 12,
-            }}
-          >
-            <Ionicons name="chatbubbles" size={38} color="#fff" />
-          </View>
-          <Text className="text-2xl font-black text-slate-900 mb-2">
-            Hi {appUser?.name?.split(' ')[0] || 'there'} 👋
-          </Text>
-          <Text className="text-[15px] text-slate-500 text-center leading-6 mb-8 px-4">
-            Our medical specialists are here to help you with your prescriptions and orders.
-          </Text>
+          <Ionicons name="call" size={20} color="#25D366" />
+        </TouchableOpacity>
+      </View>
 
-          <View className="w-full">
-            <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
-              Quick messages
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8, paddingRight: 8 }}
-              keyboardShouldPersistTaps="handled"
-            >
-              {QUICK_REPLIES.map(qr => (
-                <TouchableOpacity
-                  key={qr.label}
-                  onPress={() => handleSend(qr.label)}
-                  className="bg-white border-2 border-slate-100 rounded-2xl px-5 py-3"
-                  style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 8,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 10,
-                    elevation: 2,
-                  }}
-                >
-                  <Ionicons name={qr.icon as any} size={15} color="#005CAB" />
-                  <Text className="text-sm font-bold text-slate-700">{qr.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </Animated.View>
-      )}
-
-      {typing && <TypingDots />}
-
+      {/* ── Chat Thread ── */}
       {chat && (
         <ChatThread
           chat={chat}
           currentSender="user"
           onSendMessage={handleSend}
           isLoading={sending}
+          isDark={dark}
+          headerContent={
+            !hasMessages && (
+              <Animated.View entering={FadeInUp.delay(100).springify()} style={{ alignItems: 'center', paddingVertical: 40, paddingHorizontal: 20 }}>
+                <View style={{ width: 80, height: 80, borderRadius: 28, backgroundColor: T.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                    <Ionicons name="chatbubbles" size={38} color={T.accent} />
+                </View>
+                <Text style={{ fontSize: 22, fontWeight: '900', color: T.text, marginBottom: 8 }}>Support Center</Text>
+                <Text style={{ fontSize: 14, color: T.subText, textAlign: 'center', lineHeight: 22 }}>
+                    How can we help you today? Our pharmacists are ready to assist with your medical needs.
+                </Text>
+              </Animated.View>
+            )
+          }
         />
       )}
     </View>
   );
 }
+

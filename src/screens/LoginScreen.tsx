@@ -11,6 +11,7 @@ import Animated, {
 import { AuthButton } from '../components/AuthButton';
 import { authService } from '../services/authService';
 import { validators } from '../utils/validators';
+import { Image } from 'react-native';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -60,8 +61,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Hero section */}
         <Animated.View
           entering={FadeInUp.duration(600)}
-          className="bg-violet-600 px-6 pt-16 pb-12 rounded-b-[40px] overflow-hidden"
-          style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 16 }}
+          className=" bg-blue-700 px-6 pt-16 pb-12 rounded-b-[40px] overflow-hidden"
+          style={{ shadowColor: '#0F172A', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 16 }}
         >
           {/* Decorative circles */}
           <View className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10" />
@@ -71,7 +72,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 6 }}
           >
             <Image
-              source={require('../../assets/images/Medi.png')}
+              source={MediLogo}
               style={{ width: 48, height: 48, borderRadius: 10 }}
               resizeMode="contain"
             />
@@ -81,7 +82,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         </Animated.View>
 
         <View className="px-6 pt-8 pb-8">
-          <Animated.Text entering={FadeInDown.delay(100).duration(400)} className="text-2xl font-black text-gray-900 mb-1">
+          <Animated.Text entering={FadeInDown.delay(100).duration(400)} className="text-3xl font-black text-gray-900 mb-1">
             Welcome back
           </Animated.Text>
           <Animated.Text entering={FadeInDown.delay(150).duration(400)} className="text-sm text-gray-400 mb-7">
@@ -93,9 +94,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <Text className="text-xs font-bold text-gray-700 mb-2">Email address</Text>
             <View
               className="flex-row items-center bg-gray-50 rounded-2xl px-4 border-2 border-transparent"
-              style={{ borderColor: email ? '#6C63FF' : 'transparent' }}
+              style={{ borderColor: email ? '#0F172A' : 'transparent' }}
             >
-              <Ionicons name="mail-outline" size={18} color={email ? '#6C63FF' : '#9CA3AF'} />
+              <Ionicons name="mail-outline" size={18} color={email ? '#0F172A' : '#9CA3AF'} />
               <TextInput
                 className="flex-1 text-sm text-gray-800 py-3.5 ml-3"
                 placeholder="your@email.com"
@@ -115,9 +116,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <Text className="text-xs font-bold text-gray-700 mb-2">Password</Text>
             <View
               className="flex-row items-center bg-gray-50 rounded-2xl px-4 border-2"
-              style={{ borderColor: password ? '#6C63FF' : 'transparent' }}
+              style={{ borderColor: password ? '#0F172A' : 'transparent' }}
             >
-              <Ionicons name="lock-closed-outline" size={18} color={password ? '#6C63FF' : '#9CA3AF'} />
+              <Ionicons name="lock-closed-outline" size={18} color={password ? '#0F172A' : '#9CA3AF'} />
               <TextInput
                 className="flex-1 text-sm text-gray-800 py-3.5 ml-3"
                 placeholder="••••••••"
@@ -158,3 +159,4 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     </KeyboardAvoidingView>
   );
 };
+

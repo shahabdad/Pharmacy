@@ -52,3 +52,4 @@ export function getRoleFromEmail(email: string): 'admin' | 'user' {
 export function validateAdminAccess(email: string, role: string): boolean {
   return isAdminEmail(email) && role === 'admin';
 }
+

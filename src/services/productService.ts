@@ -80,3 +80,4 @@ export const productService = {
     await deleteDoc(doc(db, 'products', productId));
   },
 };
+
