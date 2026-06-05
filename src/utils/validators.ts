@@ -43,3 +43,4 @@ export const validators = {
     return name.trim().length >= 2;
   },
 };
+

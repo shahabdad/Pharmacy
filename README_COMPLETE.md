@@ -428,7 +428,7 @@ eas submit --platform android --latest
 ## 🎨 Design System
 
 ### Colors
-- **Primary**: Violet (#6C63FF)
+- **Primary**: Violet (#0F172A)
 - **Secondary**: Red (#EF4444)
 - **Success**: Green (#10B981)
 - **Warning**: Yellow (#F59E0B)
@@ -466,3 +466,4 @@ For issues and questions, please contact the FastMadic team.
 ---
 
 **Built with ❤️ using React Native, TypeScript, and Firebase**
+

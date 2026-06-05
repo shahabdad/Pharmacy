@@ -40,7 +40,7 @@ export const reportService = {
 
     const prescriptions = prescSnap.docs.map(d => ({ id: d.id, ...d.data() } as Prescription));
     const products = prodSnap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-    const users = userSnap.docs.map(d => ({ id: d.id, ...d.data() } as User));
+    const users = userSnap.docs.map(d => ({ uid: d.id, ...d.data() } as unknown as User));
 
     // Calculate Summary
     const totalRevenue = prescriptions
@@ -111,3 +111,4 @@ export const reportService = {
     };
   }
 };
+

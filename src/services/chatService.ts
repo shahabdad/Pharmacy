@@ -54,6 +54,7 @@ export const chatService = {
       sender,
       senderName,
       message,
+      status: 'delivered',
       timestamp: new Date().toISOString(),
     };
 
@@ -101,16 +102,12 @@ export const chatService = {
 
   // ── Get or create the user's general support chat ───────────────────────────
   async getOrCreateUserChat(userId: string, userName: string): Promise<Chat> {
-    // Try to find existing general chat for this user
-    const q = query(
-      collection(db, 'chats'),
-      where('userId', '==', userId),
-      where('type', '==', 'general')
-    );
-    const snap = await getDocs(q);
+    // Try to find existing general chat for this user using single-field query
+    const chats = await this.getUserChats(userId);
+    const generalChat = chats.find(c => c.type === 'general');
 
-    if (!snap.empty) {
-      return normaliseChat(snap.docs[0].id, snap.docs[0].data());
+    if (generalChat) {
+      return generalChat;
     }
 
     // Create a new one
@@ -162,4 +159,67 @@ export const chatService = {
       callback(all);
     });
   },
+
+  async markMessagesAsRead(chatId: string, viewerRole: 'user' | 'admin'): Promise<void> {
+    const chat = await this.getChat(chatId);
+    if (!chat || !chat.messages.length) return;
+
+    let changed = false;
+    const updatedMessages = chat.messages.map(m => {
+      if (m.sender !== viewerRole && m.status !== 'read') {
+        changed = true;
+        return { ...m, status: 'read' as const };
+      }
+      return m;
+    });
+
+    if (changed) {
+      const rawMessages = updatedMessages.map(m => ({
+        ...m,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp,
+        status: m.status ?? 'delivered'
+      }));
+      await updateDoc(doc(db, 'chats', chatId), {
+        messages: rawMessages,
+        updatedAt: serverTimestamp(),
+      });
+    }
+  },
+
+  // ─── Mark messages as read ──────────────────────────────────────────────
+  async markChatAsRead(chatId: string): Promise<void> {
+    const chatRef = doc(db, 'chats', chatId);
+    const snap = await getDoc(chatRef);
+    if (snap.exists()) {
+      const data = snap.data() as Chat;
+      const updatedMessages = (data.messages || []).map(m => {
+        if (m.sender === 'user' && m.status !== 'read') {
+          return { ...m, status: 'read' as const };
+        }
+        return m;
+      });
+
+      // Serialise timestamps back to ISO for consistency
+      const rawMessages = updatedMessages.map(m => ({
+        ...m,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : 
+                  (m.timestamp as any).toDate ? (m.timestamp as any).toDate().toISOString() : m.timestamp
+      }));
+
+      await updateDoc(chatRef, {
+        messages: rawMessages,
+        updatedAt: serverTimestamp()
+      });
+    }
+  },
+
+  // ─── Clear chat ──────────────────────────────────────────────────────────────
+
+  async clearChat(chatId: string): Promise<void> {
+    await updateDoc(doc(db, 'chats', chatId), {
+      messages: [],
+      updatedAt: serverTimestamp(),
+    });
+  },
 };
+

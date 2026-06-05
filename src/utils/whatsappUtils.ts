@@ -52,7 +52,7 @@ export const whatsappUtils = {
     userName: string,
     orderId: string
   ): string {
-    const message = `Hello ${userName}, your order (ID: ${orderId}) has been delivered! Thank you for choosing FastMadic. Rate your experience in the app.`;
+    const message = `Hello ${userName}, your order (ID: ${orderId}) has been delivered! Thank you for choosing MediCare. Rate your experience in the app.`;
     return `https://wa.me/${shopPhone}?text=${encodeURIComponent(message)}`;
   },
 
@@ -75,3 +75,4 @@ export const whatsappUtils = {
     return cleaned;
   },
 };
+

@@ -80,7 +80,7 @@ style={{
 
 // Medium shadow (buttons)
 style={{
-  shadowColor: '#6C63FF',
+  shadowColor: '#0F172A',
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.25,
   shadowRadius: 12,
@@ -89,7 +89,7 @@ style={{
 
 // Heavy shadow (hero cards)
 style={{
-  shadowColor: '#6C63FF',
+  shadowColor: '#0F172A',
   shadowOffset: { width: 0, height: 12 },
   shadowOpacity: 0.3,
   shadowRadius: 24,
@@ -194,7 +194,7 @@ style={{
 // Violet (Primary)
 violet-50:  #F5F3FF
 violet-100: #EDE9FE
-violet-600: #6C63FF
+violet-600: #0F172A
 violet-700: #5B52D9
 
 // Red (Actions)
@@ -393,7 +393,7 @@ const animStyle = useAnimatedStyle(() => ({
 <TouchableOpacity
   className="bg-violet-600 rounded-2xl py-4 items-center"
   style={{
-    shadowColor: '#6C63FF',
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
@@ -408,7 +408,7 @@ const animStyle = useAnimatedStyle(() => ({
 
 ```typescript
 <View className="w-10 h-10 bg-violet-100 rounded-2xl items-center justify-center">
-  <Ionicons name="document-text" size={20} color="#6C63FF" />
+  <Ionicons name="document-text" size={20} color="#0F172A" />
 </View>
 ```
 
@@ -680,7 +680,7 @@ className="min-w-[45%]"
 ## 🎨 Design Resources
 
 ### Color Palette
-- Primary: Violet (#6C63FF)
+- Primary: Violet (#0F172A)
 - Success: Green (#10B981)
 - Warning: Amber (#F59E0B)
 - Error: Red (#EF4444)
@@ -717,3 +717,4 @@ The FastMadic app features a **modern, clean UI** built with:
 **Status**: ✅ Complete and Production-Ready
 
 **Last Updated**: April 29, 2026
+

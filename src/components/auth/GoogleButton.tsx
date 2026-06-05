@@ -100,3 +100,4 @@ export function GoogleButton({ delay }: { delay: number }) {
     </Animated.View>
   );
 }
+

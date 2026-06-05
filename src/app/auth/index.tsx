@@ -18,6 +18,8 @@ import { GoogleButton } from '../../components/auth/GoogleButton';
 import { LoginForm } from '../../components/auth/LoginForm';
 import { RegisterForm } from '../../components/auth/RegisterForm';
 
+import { PRIMARY_BLUE } from '../../../constants/theme';
+
 export default function AuthScreen() {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -36,11 +38,12 @@ export default function AuthScreen() {
         {/* Hero */}
         <Animated.View
           entering={FadeInUp.springify().damping(16)}
-          className="bg-violet-600 px-6 rounded-b-[44px] overflow-hidden"
+          className="px-6 rounded-b-[44px] overflow-hidden"
           style={{
             paddingTop: insets.top + 24,
             paddingBottom: 36,
-            shadowColor: '#6C63FF',
+            backgroundColor: PRIMARY_BLUE,
+            shadowColor: PRIMARY_BLUE,
             shadowOffset: { width: 0, height: 14 },
             shadowOpacity: 0.28,
             shadowRadius: 28,
@@ -48,7 +51,7 @@ export default function AuthScreen() {
           }}
         >
           <View className="absolute -top-14 -right-14 w-52 h-52 rounded-full bg-white/10" pointerEvents="none" />
-          <View className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-indigo-500/30" pointerEvents="none" />
+          <View className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-blue-500/30" pointerEvents="none" />
 
           <Animated.View entering={ZoomIn.delay(100).springify()} className="mb-5">
             <View
@@ -66,7 +69,7 @@ export default function AuthScreen() {
           <Animated.Text entering={FadeInDown.delay(120).duration(400)} className="text-white text-3xl font-black tracking-tight">
             {activeTab === 'login' ? 'Welcome back' : 'Join Medicare'}
           </Animated.Text>
-          <Animated.Text entering={FadeInDown.delay(180).duration(400)} className="text-violet-200 text-sm mt-1">
+          <Animated.Text entering={FadeInDown.delay(180).duration(400)} className="text-blue-100 text-sm mt-1">
             {activeTab === 'login' ? 'Sign in to continue' : 'Medicine delivered to your door'}
           </Animated.Text>
         </Animated.View>
@@ -80,7 +83,10 @@ export default function AuthScreen() {
               className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'login' ? 'bg-white dark:bg-slate-800' : ''}`}
               style={activeTab === 'login' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 } : {}}
             >
-              <Text className={`text-sm font-bold ${activeTab === 'login' ? 'text-violet-600' : 'text-gray-400 dark:text-gray-500'}`}>
+              <Text 
+                className={`text-sm font-bold ${activeTab === 'login' ? '' : 'text-gray-400 dark:text-gray-500'}`}
+                style={activeTab === 'login' ? { color: PRIMARY_BLUE } : {}}
+              >
                 Login
               </Text>
             </TouchableOpacity>
@@ -90,7 +96,10 @@ export default function AuthScreen() {
               className={`flex-1 py-3 rounded-xl items-center ${activeTab === 'register' ? 'bg-white dark:bg-slate-800' : ''}`}
               style={activeTab === 'register' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 } : {}}
             >
-              <Text className={`text-sm font-bold ${activeTab === 'register' ? 'text-violet-600' : 'text-gray-400 dark:text-gray-500'}`}>
+              <Text 
+                className={`text-sm font-bold ${activeTab === 'register' ? '' : 'text-gray-400 dark:text-gray-500'}`}
+                style={activeTab === 'register' ? { color: PRIMARY_BLUE } : {}}
+              >
                 Sign Up
               </Text>
             </TouchableOpacity>
@@ -116,9 +125,9 @@ export default function AuthScreen() {
             <Animated.View entering={FadeInDown.delay(720).duration(400)} className="mb-4">
               <Text className="text-[11px] text-gray-400 dark:text-gray-500 text-center leading-4">
                 By signing up you agree to our{' '}
-                <Text className="text-violet-600 font-semibold">Terms of Service</Text>
+                <Text style={{ color: PRIMARY_BLUE, fontWeight: '600' }}>Terms of Service</Text>
                 {' '}and{' '}
-                <Text className="text-violet-600 font-semibold">Privacy Policy</Text>
+                <Text style={{ color: PRIMARY_BLUE, fontWeight: '600' }}>Privacy Policy</Text>
               </Text>
             </Animated.View>
           )}
@@ -129,3 +138,4 @@ export default function AuthScreen() {
     </KeyboardAvoidingView>
   );
 }
+

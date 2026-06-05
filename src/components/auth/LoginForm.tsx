@@ -120,7 +120,7 @@ export function LoginForm() {
           disabled={loading}
           style={{
             borderRadius: 18,
-            shadowColor: '#6C63FF',
+            shadowColor: '#0F172A',
             shadowOffset: { width: 0, height: 8 },
             shadowOpacity: loading ? 0 : 0.28,
             shadowRadius: 16,
@@ -133,7 +133,7 @@ export function LoginForm() {
               borderRadius: 18, paddingVertical: 16,
               alignItems: 'center', flexDirection: 'row',
               justifyContent: 'center', gap: 8,
-              backgroundColor: loading ? '#C4B5FD' : '#6C63FF',
+              backgroundColor: loading ? '#C4B5FD' : '#0F172A',
             }}
           >
             <Ionicons

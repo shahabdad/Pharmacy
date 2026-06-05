@@ -14,6 +14,7 @@ import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { reportService, ReportData } from '../services/reportService';
+import { PRIMARY_BLUE } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -32,7 +33,7 @@ export default function ReportsScreen() {
     border: dark ? '#21262D' : '#E2E8F0',
     textPri: dark ? '#F0F6FC' : '#0F172A',
     textSec: dark ? '#8B949E' : '#64748B',
-    accent: '#6366F1',
+    accent: PRIMARY_BLUE,
   };
 
   useEffect(() => {
@@ -88,7 +89,6 @@ export default function ReportsScreen() {
           <StatCard title="Revenue" value={`Rs. ${data.summary.totalRevenue.toLocaleString()}`} icon="cash-outline" color="#10B981" bg="#D1FAE5" />
           <StatCard title="Prescriptions" value={data.summary.totalPrescriptions.toString()} icon="document-text-outline" color="#6366F1" bg="#E0E7FF" />
           <StatCard title="Users" value={data.summary.totalUsers.toString()} icon="people-outline" color="#F59E0B" bg="#FEF3C7" />
-          <StatCard title="Inventory" value={data.summary.totalProducts.toString()} icon="cube-outline" color="#EF4444" bg="#FEE2E2" />
         </View>
 
         {/* Prescription Status Bar Chart */}
@@ -190,3 +190,4 @@ function ProgressBar({ label, count, total, color }: any) {
         </View>
     );
 }
+

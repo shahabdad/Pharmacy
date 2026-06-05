@@ -15,3 +15,4 @@ export function ThemedText({ type = 'default', style, ...props }: ThemedTextProp
 
   return <Text style={[typeStyles[type], style]} {...props} />;
 }
+

@@ -20,12 +20,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileSkeleton } from '@/src/components/Skeleton';
 import { Image } from 'expo-image';
-import Animated, { 
-  FadeInDown, 
-  FadeInUp, 
-  FadeIn, 
-  FadeOutUp, 
-  FadeOutDown 
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  FadeIn,
+  FadeOutUp,
+  FadeOutDown
 } from 'react-native-reanimated';
 
 const EMOJI_OPTIONS = ['👨‍⚕️', '👩‍⚕️', '💊', '🏥', '🚑', '💉', '🧪', '🧬', '🩺', '📱', '👤', '🧑‍🔬', '🌟', '🔥', '❤️', '😎', '🍀', '✨', '⚡', '🌈'];
@@ -86,25 +86,12 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await authService.logout();
-              router.replace('/auth/index' as any);
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to logout');
-            }
-          },
-        },
-      ]
-    );
+    try {
+      await authService.logout();
+      router.replace('/auth' as any);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to logout');
+    }
   };
 
   const openEditModal = () => {
@@ -127,7 +114,7 @@ export default function ProfileScreen() {
     setIsSaving(true);
     try {
       let photoURL = appUser.photoURL;
-      
+
       if (resetToDefault) {
         photoURL = "";
       } else if (tempEmoji) {
@@ -242,7 +229,7 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        
+
         {/* Header / Hero */}
         <Animated.View
           entering={FadeInDown.duration(400)}
@@ -250,7 +237,7 @@ export default function ProfileScreen() {
           className="bg-white dark:bg-slate-900 mx-5 mt-4 p-8 rounded-[40px] items-center border border-slate-100 dark:border-slate-800"
           style={{ shadowColor: '#004B87', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.05, shadowRadius: 20, elevation: 4 }}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={openEditModal}
             activeOpacity={0.9}
             className="w-28 h-28 bg-blue-50 dark:bg-blue-900/20 rounded-full items-center justify-center mb-5 overflow-hidden border-2 border-blue-100 dark:border-blue-800"
@@ -258,8 +245,8 @@ export default function ProfileScreen() {
             {appUser?.photoURL?.startsWith('emoji:') ? (
               <Text style={{ fontSize: 52 }}>{appUser.photoURL.split(':')[1]}</Text>
             ) : appUser?.photoURL ? (
-              <Image 
-                source={{ uri: appUser.photoURL }} 
+              <Image
+                source={{ uri: appUser.photoURL }}
                 style={{ width: '100%', height: '100%' }}
                 contentFit="cover"
                 transition={200}
@@ -271,7 +258,7 @@ export default function ProfileScreen() {
               <View className="w-2.5 h-2.5 bg-white rounded-full" />
             </View>
           </TouchableOpacity>
-          
+
           <Text className="text-2xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">{appUser?.name || 'Guest User'}</Text>
           <Text className="text-[13px] text-slate-400 font-bold mb-5 tracking-wide">{appUser?.email}</Text>
 
@@ -315,27 +302,27 @@ export default function ProfileScreen() {
         {/* Settings Groups */}
         <View className="px-5 mt-8">
           <Text className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1 mb-4">Account Settings</Text>
-          
-          <Animated.View 
-            entering={FadeInDown.delay(600).duration(600)} 
+
+          <Animated.View
+            entering={FadeInDown.delay(600).duration(600)}
             exiting={FadeOutDown.duration(300)}
             className="bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden border border-slate-100 dark:border-slate-800"
           >
-            <SettingItem index={0} icon="person-outline" label="Account Details" onPress={openEditModal} accent={PRIMARY_BLUE} />
+            <SettingItem index={0} icon="person-outline" label="Account Edit" onPress={openEditModal} accent={PRIMARY_BLUE} />
             <SettingItem index={1} icon="location-outline" label="Saved Addresses" onPress={() => setIsAddressModalVisible(true)} accent={PRIMARY_BLUE} />
             <SettingItem index={2} icon="notifications-outline" label="Notification Preferences" onPress={openNotifyModal} accent={PRIMARY_BLUE} />
             <SettingItem index={3} icon="moon-outline" label="Appearance" accent={PRIMARY_BLUE} right={<Text className="text-[10px] font-bold text-slate-400">{scheme === 'dark' ? 'DARK' : 'LIGHT'}</Text>} />
           </Animated.View>
 
           <Text className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1 mb-4 mt-8">Support & Security</Text>
-          <Animated.View 
-            entering={FadeInDown.delay(800).duration(600)} 
+          <Animated.View
+            entering={FadeInDown.delay(800).duration(600)}
             exiting={FadeOutDown.duration(300)}
             className="bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden border border-slate-100 dark:border-slate-800"
           >
-            <SettingItem index={4} icon="help-circle-outline" label="Help & Support" accent={PRIMARY_BLUE} onPress={() => router.push('/help' as any)} />
-            <SettingItem index={5} icon="shield-checkmark-outline" label="Privacy & Security" accent={PRIMARY_BLUE} onPress={() => router.push('/privacy' as any)} />
-            <SettingItem index={6} icon="document-text-outline" label="Terms of Service" accent={PRIMARY_BLUE} onPress={() => router.push('/terms' as any)} />
+            <SettingItem index={4} icon="help-circle-outline" label="Help & Support" accent={PRIMARY_BLUE} onPress={() => router.push('/user/help' as any)} />
+            <SettingItem index={5} icon="shield-checkmark-outline" label="Privacy & Security" accent={PRIMARY_BLUE} onPress={() => router.push('/user/privacy' as any)} />
+            <SettingItem index={6} icon="document-text-outline" label="Terms of Service" accent={PRIMARY_BLUE} onPress={() => router.push('/user/terms' as any)} />
           </Animated.View>
 
           {/* Danger Zone */}
@@ -360,9 +347,9 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Edit Profile Modal */}
-      <Modal visible={isEditModalVisible} transparent animationType="slide" onRequestClose={() => setIsEditModalVisible(false)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-t-[40px] p-8" style={{ paddingBottom: insets.bottom + 20 }}>
+      <Modal visible={isEditModalVisible} transparent animationType="fade" onRequestClose={() => setIsEditModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-3xl p-8" style={{ paddingBottom: insets.bottom + 20, width: '100%', maxWidth: 520, maxHeight: '90%' }}>
             <View className="flex-row justify-between items-center mb-8">
               <Text className="text-2xl font-black text-gray-900 dark:text-white">Edit Profile</Text>
               <TouchableOpacity onPress={() => setIsEditModalVisible(false)}>
@@ -371,7 +358,7 @@ export default function ProfileScreen() {
             </View>
 
             <View className="items-center mb-4">
-              <View 
+              <View
                 className="w-24 h-24 bg-blue-50 dark:bg-slate-800 rounded-full items-center justify-center border-4 border-blue-500/10"
               >
                 {tempEmoji ? (
@@ -379,14 +366,14 @@ export default function ProfileScreen() {
                 ) : resetToDefault || (!appUser?.photoURL && !selectedImage) ? (
                   <Ionicons name="person-outline" size={40} color={PRIMARY_BLUE} />
                 ) : (
-                  <Image 
-                    source={{ uri: selectedImage || appUser?.photoURL }} 
+                  <Image
+                    source={{ uri: selectedImage || appUser?.photoURL }}
                     style={{ width: '100%', height: '100%' }}
                     contentFit="cover"
                   />
                 )}
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={pickImage}
                 className="mt-4 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800"
               >
@@ -481,9 +468,9 @@ export default function ProfileScreen() {
       </Modal>
 
       {/* Notification Preferences Modal */}
-      <Modal visible={isNotifyModalVisible} transparent animationType="slide" onRequestClose={() => setIsNotifyModalVisible(false)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-t-[40px] p-8" style={{ paddingBottom: insets.bottom + 20 }}>
+      <Modal visible={isNotifyModalVisible} transparent animationType="fade" onRequestClose={() => setIsNotifyModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-3xl p-8" style={{ paddingBottom: insets.bottom + 20, width: '100%', maxWidth: 520, maxHeight: '90%' }}>
             <View className="flex-row justify-between items-center mb-8">
               <Text className="text-2xl font-black text-gray-900 dark:text-white">Notifications</Text>
               <TouchableOpacity onPress={() => setIsNotifyModalVisible(false)}>
@@ -492,26 +479,26 @@ export default function ProfileScreen() {
             </View>
 
             <View className="gap-4 mb-8">
-              <NotifyToggle 
-                icon="notifications-outline" 
-                title="Push Notifications" 
-                subtitle="Prescription status and chat alerts" 
-                value={pushEnabled} 
-                onValueChange={setPushEnabled} 
+              <NotifyToggle
+                icon="notifications-outline"
+                title="Push Notifications"
+                subtitle="Prescription status and chat alerts"
+                value={pushEnabled}
+                onValueChange={setPushEnabled}
               />
-              <NotifyToggle 
-                icon="mail-outline" 
-                title="Email Alerts" 
-                subtitle="Order summaries and receipts" 
-                value={emailEnabled} 
-                onValueChange={setEmailEnabled} 
+              <NotifyToggle
+                icon="mail-outline"
+                title="Email Alerts"
+                subtitle="Order summaries and receipts"
+                value={emailEnabled}
+                onValueChange={setEmailEnabled}
               />
-              <NotifyToggle 
-                icon="chatbox-ellipses-outline" 
-                title="SMS Updates" 
-                subtitle="Urgent delivery notifications" 
-                value={smsEnabled} 
-                onValueChange={setSmsEnabled} 
+              <NotifyToggle
+                icon="chatbox-ellipses-outline"
+                title="SMS Updates"
+                subtitle="Urgent delivery notifications"
+                value={smsEnabled}
+                onValueChange={setSmsEnabled}
               />
             </View>
 
@@ -535,9 +522,9 @@ export default function ProfileScreen() {
       </Modal>
 
       {/* Saved Addresses Modal */}
-      <Modal visible={isAddressModalVisible} transparent animationType="slide" onRequestClose={() => setIsAddressModalVisible(false)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-t-[40px] p-8 max-h-[90%]" style={{ paddingBottom: insets.bottom + 20 }}>
+      <Modal visible={isAddressModalVisible} transparent animationType="fade" onRequestClose={() => setIsAddressModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Animated.View entering={FadeInUp} className="bg-white dark:bg-slate-900 rounded-3xl p-8" style={{ paddingBottom: insets.bottom + 20, width: '100%', maxWidth: 520, maxHeight: '90%' }}>
             <View className="flex-row justify-between items-center mb-6">
               <Text className="text-2xl font-black text-gray-900 dark:text-white">Saved Addresses</Text>
               <TouchableOpacity onPress={() => setIsAddressModalVisible(false)}>
@@ -582,8 +569,8 @@ export default function ProfileScreen() {
                 <Animated.View entering={FadeIn} className="bg-blue-50 dark:bg-blue-900/10 p-5 rounded-3xl border border-blue-100 dark:border-blue-800 mb-4">
                   <View className="flex-row gap-2 mb-4">
                     {['Home', 'Office', 'Other'].map(l => (
-                      <TouchableOpacity 
-                        key={l} 
+                      <TouchableOpacity
+                        key={l}
                         onPress={() => setNewAddrLabel(l)}
                         className={`px-4 py-2 rounded-full border ${newAddrLabel === l ? 'bg-blue-800 border-blue-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}
                       >
@@ -640,8 +627,8 @@ function NotifyToggle({ icon, title, subtitle, value, onValueChange }: { icon: s
           <Text className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</Text>
         </View>
       </View>
-      <Switch 
-        value={value} 
+      <Switch
+        value={value}
         onValueChange={onValueChange}
         trackColor={{ false: '#D1D5DB', true: '#93C5FD' }}
         thumbColor={value ? '#004B87' : '#9CA3AF'}
@@ -650,7 +637,7 @@ function NotifyToggle({ icon, title, subtitle, value, onValueChange }: { icon: s
   );
 }
 
-function SettingItem({ icon, label, right, onPress, accent = '#6C63FF', index = 0 }: { icon: string; label: string; right?: React.ReactNode; onPress?: () => void; accent?: string; index?: number }) {
+function SettingItem({ icon, label, right, onPress, accent = '#0F172A', index = 0 }: { icon: string; label: string; right?: React.ReactNode; onPress?: () => void; accent?: string; index?: number }) {
   return (
     <Animated.View entering={FadeInDown.delay(700 + (index * 50)).duration(400)}>
       <TouchableOpacity
@@ -667,3 +654,4 @@ function SettingItem({ icon, label, right, onPress, accent = '#6C63FF', index = 
     </Animated.View>
   );
 }
+

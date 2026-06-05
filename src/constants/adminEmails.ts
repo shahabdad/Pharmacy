@@ -10,12 +10,12 @@
 
 /**
  * List of admin email addresses
- * Add or remove emails as needed
+ * Loaded dynamically from the .env configuration
  */
-export const ADMIN_EMAILS: readonly string[] = [
-  'shahabdad50@gmail.com',
-  'shhhbdad@gmail.com',
-] as const;
+const envEmails = process.env.EXPO_PUBLIC_ADMIN_EMAILS;
+export const ADMIN_EMAILS: readonly string[] = envEmails
+  ? envEmails.split(',').map(e => e.trim())
+  : ['shahabdad50@gmail.com', 'shhhbdad@gmail.com'];
 
 /**
  * Check if an email is an admin email
@@ -52,3 +52,4 @@ export function getRoleFromEmail(email: string): 'admin' | 'user' {
 export function validateAdminAccess(email: string, role: string): boolean {
   return isAdminEmail(email) && role === 'admin';
 }
+

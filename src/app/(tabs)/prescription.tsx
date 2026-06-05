@@ -3,12 +3,13 @@ import { useAuth } from '@/src/context/AuthContext';
 import { prescriptionService } from '@/src/services/prescriptionService';
 import { Prescription, PrescriptionStatus } from '@/src/types';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
     RefreshControl,
+    ScrollView,
     Text,
     TouchableOpacity,
     View,
@@ -24,10 +25,10 @@ const FILTERS: {
   icon: keyof typeof import('@expo/vector-icons').Ionicons.glyphMap;
   color: string;
 }[] = [
-  { key: 'all',       label: 'All',       icon: 'apps-outline',             color: '#6366F1' },
-  { key: 'pending',   label: 'Reviewing', icon: 'time-outline',             color: '#F59E0B' },
-  { key: 'quoted',    label: 'To Pay',    icon: 'card-outline',             color: '#3B82F6' },
-  { key: 'approved',  label: 'Approved',  icon: 'checkmark-circle-outline', color: '#10B981' },
+  { key: 'all',       label: 'All',       icon: 'apps-outline',             color: '#0F766E' },
+  { key: 'pending',   label: 'Reviewing', icon: 'time-outline',             color: '#0F766E' },
+  { key: 'quoted',    label: 'To Pay',    icon: 'wallet-outline',           color: '#0369A1' },
+  { key: 'approved',  label: 'Approved',  icon: 'checkmark-circle-outline', color: '#059669' },
   { key: 'delivered', label: 'Delivered', icon: 'cube-outline',             color: '#6366F1' },
   { key: 'rejected',  label: 'Declined',  icon: 'alert-circle-outline',     color: '#E11D48' },
 ];
@@ -42,25 +43,31 @@ function StatCard({
   return (
     <Animated.View entering={FadeInDown.delay(delay).springify()} style={{ flex: 1 }}>
       <View style={{
-        backgroundColor: bg, borderRadius: 18, padding: 14,
-        alignItems: 'center', gap: 6,
+        backgroundColor: bg, borderRadius: 24, padding: 16,
+        alignItems: 'center', gap: 8,
+        borderWidth: 1, borderColor: color + '15',
+        shadowColor: color,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05, shadowRadius: 10, elevation: 2,
       }}>
         <View style={{
-          width: 32, height: 32, borderRadius: 8,
-          backgroundColor: color + '22',
+          width: 36, height: 36, borderRadius: 12,
+          backgroundColor: color + '15',
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <Ionicons name={icon as any} size={16} color={color} />
+          <Ionicons name={icon as any} size={18} color={color} />
         </View>
-        <Text style={{ fontSize: 20, fontWeight: '900', color, letterSpacing: -0.8 }}>
-          {value}
-        </Text>
-        <Text style={{
-          fontSize: 8, fontWeight: '800', color,
-          textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.8,
-        }}>
-          {label}
-        </Text>
+        <View style={{ alignItems: 'center' }}>
+            <Text style={{ fontSize: 22, fontWeight: '900', color, letterSpacing: -0.5 }}>
+              {value}
+            </Text>
+            <Text style={{
+              fontSize: 9, fontWeight: '800', color,
+              textTransform: 'uppercase', letterSpacing: 1, opacity: 0.7,
+            }}>
+              {label}
+            </Text>
+        </View>
       </View>
     </Animated.View>
   );
@@ -71,27 +78,21 @@ function UploadButton() {
   return (
     <Link href="/upload-prescription" asChild>
       <TouchableOpacity
-        activeOpacity={0.85}
+        activeOpacity={0.9}
         style={{
           flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-          gap: 10, paddingVertical: 16, borderRadius: 20,
-          backgroundColor: '#6366F1',
-          shadowColor: '#6366F1',
-          shadowOffset: { width: 0, height: 6 },
+          gap: 12, paddingVertical: 18, borderRadius: 24,
+          backgroundColor: '#0F4C81',
+          shadowColor: '#0F4C81',
+          shadowOffset: { width: 0, height: 8 },
           shadowOpacity: 0.3,
-          shadowRadius: 14,
-          elevation: 8,
+          shadowRadius: 16,
+          elevation: 10,
         }}
       >
-        <View style={{
-          width: 28, height: 28, borderRadius: 8,
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Ionicons name="add" size={18} color="#fff" />
-        </View>
-        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15, letterSpacing: 0.2 }}>
-          New Prescription
+        <Ionicons name="cloud-upload" size={20} color="#fff" />
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16, letterSpacing: 0.5 }}>
+          Upload New Prescription
         </Text>
       </TouchableOpacity>
     </Link>
@@ -102,7 +103,7 @@ function UploadButton() {
 export default function PrescriptionScreen() {
   const insets = useSafeAreaInsets();
   const dark   = useColorScheme() === 'dark';
-  const { appUser } = useAuth();
+  const { appUser, loading: authLoading } = useAuth();
 
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading,       setLoading]       = useState(true);
@@ -111,20 +112,28 @@ export default function PrescriptionScreen() {
 
   // ── Theme ──────────────────────────────────────────────────────────────────
   const T = {
-    screenBg:  dark ? '#0D1117' : '#F8FAFC',
+    screenBg:  dark ? '#0D1117' : '#F2F4F7',
     headerBg:  dark ? '#161B22' : '#FFFFFF',
-    border:    dark ? '#21262D' : '#F1F5F9',
-    textPri:   dark ? '#F0F6FC' : '#0F172A',
-    textSec:   dark ? '#8B949E' : '#64748B',
-    textMuted: dark ? '#6E7681' : '#94A3B8',
-    chipBg:    dark ? '#21262D' : '#FFFFFF',
-    chipBord:  dark ? '#30363D' : '#E2E8F0',
-    emptyBg:   dark ? '#21262D' : '#F1F5F9',
+    border:    dark ? '#21262D' : '#E5E7EB',
+    textPri:   dark ? '#F0F6FC' : '#111827',
+    textSec:   dark ? '#8B949E' : '#4B5563',
+    textMuted: dark ? '#6E7681' : '#9CA3AF',
+    chipBg:    dark ? '#161B22' : '#FFFFFF',
+    chipBord:  dark ? '#30363D' : '#E5E7EB',
+    emptyBg:   dark ? '#161B22' : '#FFFFFF',
   };
 
   // ── Load ───────────────────────────────────────────────────────────────────
   const load = async (isRefresh = false) => {
-    if (!appUser) return;
+    if (!appUser) {
+      if (!authLoading) {
+        setPrescriptions([]);
+        setLoading(false);
+        setRefreshing(false);
+      }
+      return;
+    }
+
     try {
       isRefresh ? setRefreshing(true) : setLoading(true);
       const data = await prescriptionService.getUserPrescriptions(appUser.uid);
@@ -138,7 +147,9 @@ export default function PrescriptionScreen() {
     }
   };
 
-  useEffect(() => { load(); }, [appUser?.uid]);
+  useEffect(() => {
+    load();
+  }, [appUser?.uid, authLoading]);
 
   // ── Derived ────────────────────────────────────────────────────────────────
   const counts = useMemo(() =>
@@ -168,16 +179,16 @@ export default function PrescriptionScreen() {
       }}>
         <Animated.View entering={FadeIn.duration(400)} style={{ alignItems: 'center' }}>
           <View style={{
-            width: 72, height: 72, borderRadius: 22,
-            backgroundColor: '#6366F1' + '20',
-            alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-            borderWidth: 1.5, borderColor: '#6366F1' + '40',
+            width: 80, height: 80, borderRadius: 28,
+            backgroundColor: '#0F766E' + '15',
+            alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+            borderWidth: 1.5, borderColor: '#0F766E' + '25',
           }}>
-            <Ionicons name="document-text" size={34} color="#6366F1" />
+            <Ionicons name="document-text" size={38} color="#0F766E" />
           </View>
-          <ActivityIndicator size="large" color="#6366F1" />
-          <Text style={{ fontSize: 13, color: T.textMuted, marginTop: 12, fontWeight: '600' }}>
-            Loading prescriptions…
+          <ActivityIndicator size="small" color="#0F766E" />
+          <Text style={{ fontSize: 14, color: T.textSec, marginTop: 16, fontWeight: '700' }}>
+            Retrieving your records...
           </Text>
         </Animated.View>
       </View>
@@ -193,40 +204,39 @@ export default function PrescriptionScreen() {
         style={{
           backgroundColor: T.headerBg,
           paddingHorizontal: 20,
-          paddingTop: 18,
-          paddingBottom: 16,
+          paddingTop: 16,
+          paddingBottom: 20,
           borderBottomWidth: 1,
           borderBottomColor: T.border,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: dark ? 0.3 : 0.05,
-          shadowRadius: 8,
-          elevation: 3,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: dark ? 0.3 : 0.04,
+          shadowRadius: 10,
+          elevation: 4,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <View>
             <Text style={{
-              fontSize: 12, color: T.textMuted, fontWeight: '600',
-              letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2,
+              fontSize: 10, color: '#0F766E', fontWeight: '900',
+              letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
             }}>
-              My Health Records
+              Personal Health
             </Text>
-            <Text style={{ fontSize: 26, fontWeight: '900', color: T.textPri, letterSpacing: -0.5 }}>
+            <Text style={{ fontSize: 28, fontWeight: '900', color: T.textPri, letterSpacing: -0.8 }}>
               Prescriptions
             </Text>
           </View>
-          {prescriptions.length > 0 && (
-            <View style={{
-              backgroundColor: '#6366F1' + '18',
-              borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5,
-              borderWidth: 1, borderColor: '#6366F1' + '30',
-            }}>
-              <Text style={{ fontSize: 12, fontWeight: '800', color: '#6366F1' }}>
-                {prescriptions.length} total
-              </Text>
-            </View>
-          )}
+          <TouchableOpacity 
+            onPress={() => load(true)}
+            style={{ 
+                width: 44, height: 44, borderRadius: 14, 
+                backgroundColor: T.chipBg, alignItems: 'center', justifyContent: 'center',
+                borderWidth: 1, borderColor: T.chipBord
+            }}
+          >
+            <Ionicons name="refresh" size={20} color={T.textSec} />
+          </TouchableOpacity>
         </View>
       </Animated.View>
 
@@ -235,13 +245,13 @@ export default function PrescriptionScreen() {
         data={filtered}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, paddingTop: 16 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => load(true)}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor="#0F766E"
+            colors={['#0F766E']}
           />
         }
 
@@ -251,19 +261,19 @@ export default function PrescriptionScreen() {
             {prescriptions.length > 0 && (
               <Animated.View
                 entering={FadeInDown.delay(80).duration(350)}
-                style={{ flexDirection: 'row', gap: 10, marginTop: 16, marginBottom: 16 }}
+                style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}
               >
                 <StatCard
-                  label="Active"   value={activeCount}  icon="flash-outline"
-                  color="#6366F1"  bg={dark ? '#1E1B4B' : '#EEF2FF'}  delay={100}
+                  label="Active"   value={activeCount}  icon="pulse"
+                  color="#0F766E"  bg={dark ? '#0F766E22' : '#F0FDFA'}  delay={100}
                 />
                 <StatCard
-                  label="Pending"  value={pendingCount} icon="time-outline"
-                  color="#F59E0B"  bg={dark ? '#78350F' : '#FEF3C7'}  delay={150}
+                  label="Review"   value={pendingCount} icon="time"
+                  color="#B45309"  bg={dark ? '#B4530922' : '#FFFBEB'}  delay={150}
                 />
                 <StatCard
-                  label="Done"     value={doneCount}    icon="checkmark-done"
-                  color="#10B981"  bg={dark ? '#064E3B' : '#D1FAE5'}  delay={200}
+                  label="Completed" value={doneCount}    icon="checkmark-done-circle"
+                  color="#059669"  bg={dark ? '#05966922' : '#ECFDF5'}  delay={200}
                 />
               </Animated.View>
             )}
@@ -271,7 +281,7 @@ export default function PrescriptionScreen() {
             {/* Upload */}
             <Animated.View
               entering={FadeInDown.delay(120).duration(350)}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: 24 }}
             >
               <UploadButton />
             </Animated.View>
@@ -280,15 +290,20 @@ export default function PrescriptionScreen() {
             {prescriptions.length > 0 && (
               <Animated.View
                 entering={FadeInDown.delay(180).duration(350)}
-                style={{ marginBottom: 16 }}
+                style={{ marginBottom: 20 }}
               >
-                <Text style={{
-                  fontSize: 11, fontWeight: '700', color: T.textMuted,
-                  textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10,
-                }}>
-                  Filter by status
-                </Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <Text style={{
+                      fontSize: 12, fontWeight: '800', color: T.textPri,
+                      textTransform: 'uppercase', letterSpacing: 0.8,
+                    }}>
+                      Status Filter
+                    </Text>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: T.textMuted }}>
+                        {prescriptions.length} items total
+                    </Text>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 4 }}>
                   {FILTERS.map(f => {
                     const active = activeFilter === f.key;
                     const count  = f.key === 'all' ? prescriptions.length : (counts[f.key] ?? 0);
@@ -298,30 +313,30 @@ export default function PrescriptionScreen() {
                         key={f.key}
                         onPress={() => setActiveFilter(f.key)}
                         style={{
-                          flexDirection: 'row', alignItems: 'center', gap: 6,
-                          paddingHorizontal: 13, paddingVertical: 8,
-                          borderRadius: 22,
+                          flexDirection: 'row', alignItems: 'center', gap: 8,
+                          paddingHorizontal: 16, paddingVertical: 10,
+                          borderRadius: 20,
                           backgroundColor: active ? f.color : T.chipBg,
                           borderWidth: 1.5,
                           borderColor: active ? f.color : T.chipBord,
                           shadowColor: active ? f.color : '#000',
                           shadowOffset: { width: 0, height: active ? 4 : 1 },
-                          shadowOpacity: active ? 0.25 : 0.04,
-                          shadowRadius: active ? 8 : 3,
-                          elevation: active ? 5 : 1,
+                          shadowOpacity: active ? 0.2 : 0.05,
+                          shadowRadius: active ? 8 : 4,
+                          elevation: active ? 4 : 1,
                         }}
                       >
-                        <Ionicons name={f.icon} size={13} color={active ? '#fff' : f.color} />
+                        <Ionicons name={f.icon} size={14} color={active ? '#fff' : f.color} />
                         <Text style={{
-                          fontSize: 12, fontWeight: '700',
+                          fontSize: 13, fontWeight: '800',
                           color: active ? '#fff' : T.textSec,
                         }}>
                           {f.label}
                         </Text>
                         <View style={{
-                          backgroundColor: active ? 'rgba(255,255,255,0.25)' : f.color + '20',
-                          borderRadius: 10, minWidth: 20,
-                          paddingHorizontal: 5, paddingVertical: 1,
+                          backgroundColor: active ? 'rgba(255,255,255,0.25)' : f.color + '15',
+                          borderRadius: 10, minWidth: 22,
+                          paddingHorizontal: 6, paddingVertical: 2,
                           alignItems: 'center',
                         }}>
                           <Text style={{
@@ -334,7 +349,7 @@ export default function PrescriptionScreen() {
                       </TouchableOpacity>
                     );
                   })}
-                </View>
+                </ScrollView>
               </Animated.View>
             )}
 
@@ -342,24 +357,22 @@ export default function PrescriptionScreen() {
             {filtered.length > 0 && (
               <View style={{
                 flexDirection: 'row', alignItems: 'center',
-                justifyContent: 'space-between', marginBottom: 12,
+                justifyContent: 'space-between', marginBottom: 16,
               }}>
                 <Text style={{
-                  fontSize: 13, fontWeight: '800', color: T.textSec,
-                  textTransform: 'uppercase', letterSpacing: 0.6,
+                  fontSize: 14, fontWeight: '900', color: T.textPri,
+                  letterSpacing: -0.2,
                 }}>
-                  {activeFilter === 'all'
-                    ? `All (${filtered.length})`
-                    : `${activeFilter} (${filtered.length})`}
+                  {activeFilter === 'all' ? 'All Records' : `${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)} Records`}
                 </Text>
                 <View style={{
-                  flexDirection: 'row', alignItems: 'center', gap: 4,
-                  backgroundColor: T.chipBg, borderRadius: 10,
-                  paddingHorizontal: 8, paddingVertical: 4,
+                  flexDirection: 'row', alignItems: 'center', gap: 6,
+                  backgroundColor: T.chipBg, borderRadius: 12,
+                  paddingHorizontal: 10, paddingVertical: 6,
                   borderWidth: 1, borderColor: T.chipBord,
                 }}>
-                  <Ionicons name="swap-vertical-outline" size={12} color={T.textMuted} />
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: T.textMuted }}>Newest</Text>
+                  <Ionicons name="funnel-outline" size={12} color={T.textSec} />
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: T.textSec }}>Recent</Text>
                 </View>
               </View>
             )}
@@ -370,7 +383,7 @@ export default function PrescriptionScreen() {
           <Animated.View entering={FadeInDown.delay(index * 55 + 200).duration(350)}>
             <PrescriptionCard
               prescription={item}
-              onPress={() => {/* detail screen not yet built */}}
+              onPress={(id) => router.push(`/prescription/${id}` as any)}
             />
           </Animated.View>
         )}
@@ -378,61 +391,57 @@ export default function PrescriptionScreen() {
         ListEmptyComponent={
           <Animated.View
             entering={FadeInUp.delay(200).springify()}
-            style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 24 }}
+            style={{ alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32 }}
           >
             <View style={{
-              width: 100, height: 100, borderRadius: 30,
+              width: 120, height: 120, borderRadius: 40,
               backgroundColor: T.emptyBg,
               alignItems: 'center', justifyContent: 'center',
-              marginBottom: 20,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: dark ? 0.3 : 0.07,
-              shadowRadius: 16,
-              elevation: 4,
+              marginBottom: 24,
+              borderWidth: 1, borderColor: T.border,
+              shadowColor: '#000', shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.05, shadowRadius: 20, elevation: 5,
             }}>
               <Ionicons
-                name={activeFilter === 'all' ? 'document-text-outline' : 'filter-outline'}
-                size={46}
-                color={dark ? '#30363D' : '#CBD5E1'}
+                name={activeFilter === 'all' ? 'document-text' : 'search'}
+                size={54}
+                color={dark ? '#30363D' : '#E2E8F0'}
               />
             </View>
 
             <Text style={{
-              fontSize: 18, fontWeight: '900', color: T.textPri,
-              marginBottom: 8, textAlign: 'center', letterSpacing: -0.3,
+              fontSize: 22, fontWeight: '900', color: T.textPri,
+              marginBottom: 10, textAlign: 'center', letterSpacing: -0.5,
             }}>
               {activeFilter === 'all'
-                ? 'No prescriptions yet'
-                : `No ${activeFilter} prescriptions`}
+                ? 'No records found'
+                : `No results for "${activeFilter}"`}
             </Text>
             <Text style={{
-              fontSize: 13, color: T.textMuted, textAlign: 'center',
-              lineHeight: 20, marginBottom: 28, maxWidth: 260,
+              fontSize: 15, color: T.textSec, textAlign: 'center',
+              lineHeight: 22, marginBottom: 32, maxWidth: 280,
             }}>
               {activeFilter === 'all'
-                ? 'Upload your first prescription and our pharmacist will review it shortly.'
-                : 'Try selecting a different filter to see your prescriptions.'}
+                ? 'Your uploaded prescriptions and their history will appear here for easy tracking.'
+                : 'Try adjusting your filters to find the prescriptions you are looking for.'}
             </Text>
 
             {activeFilter === 'all' ? (
               <Link href="/upload-prescription" asChild>
                 <TouchableOpacity
                   style={{
-                    backgroundColor: '#6366F1',
-                    paddingHorizontal: 28, paddingVertical: 14,
-                    borderRadius: 18,
-                    flexDirection: 'row', alignItems: 'center', gap: 8,
-                    shadowColor: '#6366F1',
+                    backgroundColor: '#0F766E',
+                    paddingHorizontal: 32, paddingVertical: 16,
+                    borderRadius: 20,
+                    flexDirection: 'row', alignItems: 'center', gap: 10,
+                    shadowColor: '#0F766E',
                     shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: 0.35,
-                    shadowRadius: 14,
-                    elevation: 8,
+                    shadowOpacity: 0.3, shadowRadius: 12, elevation: 8,
                   }}
                 >
-                  <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
-                  <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>
-                    Upload Prescription
+                  <Ionicons name="add-circle" size={22} color="#fff" />
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>
+                    Upload Now
                   </Text>
                 </TouchableOpacity>
               </Link>
@@ -441,15 +450,15 @@ export default function PrescriptionScreen() {
                 onPress={() => setActiveFilter('all')}
                 style={{
                   backgroundColor: T.chipBg,
-                  paddingHorizontal: 24, paddingVertical: 12,
-                  borderRadius: 16,
-                  flexDirection: 'row', alignItems: 'center', gap: 8,
+                  paddingHorizontal: 28, paddingVertical: 14,
+                  borderRadius: 18,
+                  flexDirection: 'row', alignItems: 'center', gap: 10,
                   borderWidth: 1.5, borderColor: T.chipBord,
                 }}
               >
-                <Ionicons name="apps-outline" size={16} color="#6366F1" />
-                <Text style={{ color: '#6366F1', fontWeight: '700', fontSize: 13 }}>
-                  View All
+                <Ionicons name="apps" size={18} color="#0F766E" />
+                <Text style={{ color: '#0F766E', fontWeight: '800', fontSize: 14 }}>
+                  Reset Filters
                 </Text>
               </TouchableOpacity>
             )}
@@ -459,3 +468,5 @@ export default function PrescriptionScreen() {
     </View>
   );
 }
+
+

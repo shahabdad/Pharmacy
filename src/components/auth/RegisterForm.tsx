@@ -110,8 +110,8 @@ export function RegisterForm() {
                 justifyContent: 'center', gap: 8,
                 paddingVertical: 14, borderRadius: 16,
                 borderWidth: 2,
-                backgroundColor: role === r ? '#6C63FF' : (dark ? '#0D1117' : '#F9FAFB'),
-                borderColor: role === r ? '#6C63FF' : (dark ? '#21262D' : 'transparent'),
+                backgroundColor: role === r ? '#0F172A' : (dark ? '#0D1117' : '#F9FAFB'),
+                borderColor: role === r ? '#0F172A' : (dark ? '#21262D' : 'transparent'),
               }}
             >
               <Ionicons
@@ -158,7 +158,7 @@ export function RegisterForm() {
           disabled={loading}
           style={{
             borderRadius: 18,
-            shadowColor: '#6C63FF',
+            shadowColor: '#0F172A',
             shadowOffset: { width: 0, height: 8 },
             shadowOpacity: loading ? 0 : 0.28,
             shadowRadius: 16,
@@ -171,7 +171,7 @@ export function RegisterForm() {
               borderRadius: 18, paddingVertical: 16,
               alignItems: 'center', flexDirection: 'row',
               justifyContent: 'center', gap: 8,
-              backgroundColor: loading ? '#C4B5FD' : '#6C63FF',
+              backgroundColor: loading ? '#C4B5FD' : '#0F172A',
             }}
           >
             <Ionicons
@@ -188,3 +188,4 @@ export function RegisterForm() {
     </>
   );
 }
+

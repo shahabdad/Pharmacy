@@ -300,3 +300,4 @@ For questions or issues related to the shop system:
 - **Configuration**: See `.env.example` for environment variables
 
 **Last Updated**: April 29, 2026
+

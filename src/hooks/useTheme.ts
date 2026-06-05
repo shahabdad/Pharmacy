@@ -31,12 +31,12 @@ export function useTheme() {
 
     // ── Borders ───────────────────────────────────────────────────────────────
     border:         dark ? '#21262D' : '#E2E8F0',
-    borderFocus:    '#6C63FF',
+    borderFocus:    '#0F172A',
     borderLight:    dark ? '#30363D' : '#F1F5F9',
 
     // ── Accent ───────────────────────────────────────────────────────────────
-    accent:         '#6C63FF',
-    accentLight:    dark ? '#A09AFF' : '#6C63FF',
+    accent:         '#0F172A',
+    accentLight:    dark ? '#A09AFF' : '#0F172A',
     accentBg:       dark ? '#1E1B4B' : '#EEF2FF',
 
     // ── Handle / divider ─────────────────────────────────────────────────────
@@ -58,3 +58,4 @@ export function useTheme() {
 }
 
 export type Theme = ReturnType<typeof useTheme>;
+

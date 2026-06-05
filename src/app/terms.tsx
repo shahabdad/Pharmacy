@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { CONTACT_CONFIG } from '../constants/contact';
+import { PRIMARY_BLUE } from '../../constants/theme';
 
 const SECTIONS = [
   {
@@ -34,7 +35,6 @@ export default function TermsOfServiceScreen() {
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
 
-  const PRIMARY_BLUE = '#004B87';
   const textPrimary = isDark ? '#F0F6FC' : '#0F172A';
   const textSecondary = isDark ? '#8B949E' : '#64748B';
   const cardBg = isDark ? '#161B22' : '#FFFFFF';
@@ -47,7 +47,7 @@ export default function TermsOfServiceScreen() {
         paddingTop: insets.top + 10, 
         paddingHorizontal: 20, 
         paddingBottom: 20,
-        backgroundColor: isDark ? '#0F172A' : '#0F172A', // Dark header for both
+        backgroundColor: PRIMARY_BLUE, // Primary blue header
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
       }}>
@@ -127,3 +127,4 @@ export default function TermsOfServiceScreen() {
     </View>
   );
 }
+

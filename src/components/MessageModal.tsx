@@ -88,13 +88,15 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
       style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         zIndex: 1000,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
         backgroundColor: 'rgba(0,0,0,0.55)',
       }}
     >
       {/* Backdrop */}
       <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); onCancel(); }}>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, width: '100%' }} />
       </TouchableWithoutFeedback>
 
       {/* Sheet slides up with keyboard */}
@@ -104,10 +106,12 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
             entering={SlideInDown.springify().damping(18)}
             style={{
               backgroundColor: T.sheetBg,
-              borderTopLeftRadius: 32, borderTopRightRadius: 32,
+              borderRadius: 28,
+              width: '100%',
+              maxWidth: 520,
               paddingHorizontal: 20,
               paddingBottom: Platform.OS === 'ios' ? 40 : 28,
-              shadowColor: '#000', shadowOffset: { width: 0, height: -4 },
+              shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
               shadowOpacity: dark ? 0.4 : 0.1, shadowRadius: 20, elevation: 20,
             }}
           >
@@ -120,7 +124,7 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
 
             {/* Step dots */}
             <View style={{ flexDirection: 'row', gap: 6, marginBottom: 20 }}>
-              <View style={{ height: 5, width: 48, borderRadius: 3, backgroundColor: '#6C63FF' }} />
+              <View style={{ height: 5, width: 48, borderRadius: 3, backgroundColor: '#0F172A' }} />
               <View style={{ height: 5, width: 20, borderRadius: 3, backgroundColor: T.stepDot }} />
             </View>
 
@@ -138,7 +142,7 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
               backgroundColor: T.inputBg, borderRadius: 16,
               paddingHorizontal: 14, paddingVertical: 12,
               borderWidth: 1.5,
-              borderColor: message.length > 0 ? '#6C63FF' : T.inputBorder,
+              borderColor: message.length > 0 ? '#0F172A' : T.inputBorder,
               marginBottom: 6,
             }}>
               <TextInput
@@ -174,11 +178,11 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
               <Pressable
                 onPress={() => { Keyboard.dismiss(); onNext(); }}
                 style={{
-                  flex: 2, backgroundColor: '#6C63FF',
+                  flex: 2, backgroundColor: '#0F172A',
                   borderRadius: 18, paddingVertical: 15,
                   alignItems: 'center', justifyContent: 'center',
                   flexDirection: 'row', gap: 8,
-                  shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 },
+                  shadowColor: '#0F172A', shadowOffset: { width: 0, height: 6 },
                   shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
                 }}
               >
@@ -192,3 +196,4 @@ export function MessageModal({ visible, message, onChange, onNext, onCancel }: P
     </AnimatedRN.View>
   );
 }
+

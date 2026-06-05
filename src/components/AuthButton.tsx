@@ -13,7 +13,7 @@ interface AuthButtonProps {
 }
 
 const VARIANT_STYLES = {
-  primary:   { bg: 'bg-violet-600',  text: 'text-white',      shadow: '#6C63FF' },
+  primary:   { bg: 'bg-violet-600',  text: 'text-white',      shadow: '#0F172A' },
   secondary: { bg: 'bg-gray-100',    text: 'text-violet-600', shadow: '#000'    },
   danger:    { bg: 'bg-red-500',     text: 'text-white',      shadow: '#EF4444' },
 };
@@ -57,3 +57,4 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
     </Animated.View>
   );
 };
+

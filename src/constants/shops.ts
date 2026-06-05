@@ -1,7 +1,7 @@
 /**
  * Shop Configuration
  * 
- * Currently supports single shop: "MadicCare"
+ * Currently supports single shop: "MediCare"
  * All orders are automatically assigned to this default shop.
  * 
  * Future Enhancements:
@@ -39,7 +39,7 @@ export interface ShopConfig {
  */
 export const DEFAULT_SHOP: ShopConfig = {
   id: 'medicare-default',
-  name: 'Medicare',
+  name: 'MediCare',
   region: 'default',
   contact: '+923191796621',
   whatsapp: '+923191796621',
@@ -89,3 +89,4 @@ export function getAllActiveShops(): ShopConfig[] {
   // For now, return only default shop
   return [DEFAULT_SHOP];
 }
+

@@ -173,3 +173,4 @@
 
 console.log('FastMadic Setup Complete! 🚀');
 console.log('Ready to build the future of pharmacy delivery.');
+

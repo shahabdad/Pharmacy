@@ -413,3 +413,4 @@ const adminEmails = adminsSnap.docs.map(d => d.data().email);
 **Admin Dashboard**: Check `src/app/admin-dashboard.tsx`
 
 **Last Updated**: April 29, 2026
+

@@ -208,3 +208,4 @@ export const UserSkeleton = () => (
     ))}
   </View>
 );
+

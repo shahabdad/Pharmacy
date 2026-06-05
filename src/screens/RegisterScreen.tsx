@@ -67,13 +67,13 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
         <Animated.View
           entering={FadeInDown.duration(500)}
           className="bg-violet-600 px-6 pt-14 pb-10 rounded-b-[40px] overflow-hidden"
-          style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 16 }}
+          style={{ shadowColor: '#0F172A', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 16 }}
         >
           <View className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
           <View className="w-12 h-12 bg-white rounded-2xl items-center justify-center mb-3"
             style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 6 }}
           >
-            <Ionicons name="person-add" size={22} color="#6C63FF" />
+            <Ionicons name="person-add" size={22} color="#0F172A" />
           </View>
           <Text className="text-white text-2xl font-black">Create Account</Text>
           <Text className="text-violet-200 text-xs mt-1">Join Medicare today</Text>
@@ -86,9 +86,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               <Text className="text-xs font-bold text-gray-700 mb-2">{f.label}</Text>
               <View
                 className="flex-row items-center bg-gray-50 rounded-2xl px-4 border-2"
-                style={{ borderColor: f.value ? '#6C63FF' : 'transparent' }}
+                style={{ borderColor: f.value ? '#0F172A' : 'transparent' }}
               >
-                <Ionicons name={f.icon as any} size={17} color={f.value ? '#6C63FF' : '#9CA3AF'} />
+                <Ionicons name={f.icon as any} size={17} color={f.value ? '#0F172A' : '#9CA3AF'} />
                 <TextInput
                   className="flex-1 text-sm text-gray-800 py-3.5 ml-3"
                   placeholder={f.placeholder}
@@ -135,9 +135,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Text className="text-xs font-bold text-gray-700 mb-2">Password</Text>
             <View
               className="flex-row items-center bg-gray-50 rounded-2xl px-4 border-2"
-              style={{ borderColor: password ? '#6C63FF' : 'transparent' }}
+              style={{ borderColor: password ? '#0F172A' : 'transparent' }}
             >
-              <Ionicons name="lock-closed-outline" size={17} color={password ? '#6C63FF' : '#9CA3AF'} />
+              <Ionicons name="lock-closed-outline" size={17} color={password ? '#0F172A' : '#9CA3AF'} />
               <TextInput
                 className="flex-1 text-sm text-gray-800 py-3.5 ml-3"
                 placeholder="••••••••"
@@ -158,9 +158,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
             <Text className="text-xs font-bold text-gray-700 mb-2">Confirm Password</Text>
             <View
               className="flex-row items-center bg-gray-50 rounded-2xl px-4 border-2"
-              style={{ borderColor: confirmPassword ? '#6C63FF' : 'transparent' }}
+              style={{ borderColor: confirmPassword ? '#0F172A' : 'transparent' }}
             >
-              <Ionicons name="lock-closed-outline" size={17} color={confirmPassword ? '#6C63FF' : '#9CA3AF'} />
+              <Ionicons name="lock-closed-outline" size={17} color={confirmPassword ? '#0F172A' : '#9CA3AF'} />
               <TextInput
                 className="flex-1 text-sm text-gray-800 py-3.5 ml-3"
                 placeholder="••••••••"
@@ -195,3 +195,4 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
     </KeyboardAvoidingView>
   );
 };
+

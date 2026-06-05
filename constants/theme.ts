@@ -1,13 +1,14 @@
-export const ACCENT = '#6C63FF';
+export const ACCENT = '#0F172A';
 export const INACTIVE_COLOR = '#C7C7CC';
+export const PRIMARY_BLUE = '#0F172A'
 
 export const Colors = {
   light: {
     text: '#000',
     background: '#fff',
-    tint: '#4A90E2',
+    tint: '#004B87',
     tabIconDefault: '#BDBDBD',
-    tabIconSelected: '#4A90E2',
+    tabIconSelected: '#004B87',
     tabBackground: '#fff',
     tabBorder: '#E0E0E0',
   },
@@ -21,3 +22,4 @@ export const Colors = {
     tabBorder: '#333',
   },
 };
+

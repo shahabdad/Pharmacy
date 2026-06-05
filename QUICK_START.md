@@ -414,3 +414,4 @@ Start by setting up Firebase, then run the app and start testing.
 
 *Last updated: 2024*
 *FastMadic Team*
+

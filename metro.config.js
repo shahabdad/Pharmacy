@@ -8,3 +8,4 @@ const config = getDefaultConfig(__dirname);
 process.env.EXPO_ROUTER_APP_ROOT = path.join(__dirname, 'src/app');
 
 module.exports = withNativeWind(config, { input: './global.css' });
+

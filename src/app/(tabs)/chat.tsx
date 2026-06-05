@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -355,7 +356,7 @@ export default function ChatScreen() {
           onSendMessage={handleSend}
           isLoading={sending}
           isDark={dark}
-          headerHeight={headerH}
+          bottomOffset={Platform.OS === 'ios' ? 90 : 70}
           headerContent={
             <>
               {welcomeContent}
@@ -367,3 +368,4 @@ export default function ChatScreen() {
     </View>
   );
 }
+

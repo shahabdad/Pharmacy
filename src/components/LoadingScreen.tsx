@@ -86,3 +86,4 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = 'Connect
     </View>
   );
 };
+

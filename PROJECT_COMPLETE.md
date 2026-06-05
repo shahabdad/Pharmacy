@@ -204,7 +204,7 @@ ELSE → User Home (Tabs)
 - ✅ Platform optimization (iOS/Android)
 
 **Color Palette:**
-- Primary: Violet (#6C63FF)
+- Primary: Violet (#0F172A)
 - Success: Green (#10B981)
 - Warning: Amber (#F59E0B)
 - Error: Red (#EF4444)
@@ -585,3 +585,4 @@ FastMadic is a **complete, production-ready** pharmacy delivery system with:
 
 **Version**: 1.0.0  
 **Last Updated**: April 29, 2026
+

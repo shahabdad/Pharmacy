@@ -4,3 +4,4 @@ import { AppRegistry } from 'react-native';
 const RootComponent = ExpoRoot;
 
 AppRegistry.registerComponent('FastMadic', () => RootComponent);
+

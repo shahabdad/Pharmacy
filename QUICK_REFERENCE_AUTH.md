@@ -136,3 +136,4 @@ npm run ios
 **Admin Emails**: `src/constants/adminEmails.ts`  
 **Auth Logic**: `src/services/authService.ts`  
 **Route Protection**: `src/app/_layout.tsx`
+

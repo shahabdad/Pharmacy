@@ -46,3 +46,4 @@ export const storage    = getStorage(app);
 export const realtimeDb = getDatabase(app); // Realtime Database instance
 
 export default app;
+

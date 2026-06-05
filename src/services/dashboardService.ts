@@ -14,6 +14,9 @@ export interface DashboardStats {
   prescriptions: number;
   activeChats: number;
   revenue: number;
+  userCount: number;
+  orders: number;
+  deliveredOrders: number;
 }
 
 export interface ActivityItem {
@@ -47,10 +50,17 @@ export const dashboardService = {
     // For simplicity, we'll just count all chats for now
     const chatSnap = await getDocs(collection(db, 'chats'));
 
+    // User count
+    const userSnap = await getDocs(collection(db, 'users'));
+    const userCount = userSnap.size;
+
     return {
       prescriptions: prescSnap.size,
-      activeChats:   chatSnap.size,
+      activeChats: chatSnap.size,
       revenue,
+      userCount,
+      orders: orderSnap.size,
+      deliveredOrders: deliveredOrders.length,
     };
   },
 
@@ -101,3 +111,4 @@ export const dashboardService = {
     return activities.sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 10);
   }
 };
+

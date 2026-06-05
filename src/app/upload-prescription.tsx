@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert, Image,
+    ActivityIndicator,
+    Alert,
     ScrollView, Text, TouchableOpacity, View
 } from 'react-native';
 import Animated, {
@@ -13,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { submitPrescriptionOrder } from '../services/prescriptionService';
+import { useAuth } from '../context/AuthContext';
 
 const tips = [
   { icon: 'sunny-outline',    text: 'Good lighting, avoid shadows'       },
@@ -23,6 +26,7 @@ const tips = [
 
 export default function UploadPrescriptionScreen() {
   const insets   = useSafeAreaInsets();
+  const { appUser } = useAuth();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading,  setLoading]  = useState(false);
 
@@ -38,8 +42,8 @@ export default function UploadPrescriptionScreen() {
       return;
     }
     const result = source === 'camera'
-      ? await ImagePicker.launchCameraAsync({ quality: 0.85 })
-      : await ImagePicker.launchImageLibraryAsync({ quality: 0.85 });
+      ? await ImagePicker.launchCameraAsync({ quality: 0.85, allowsEditing: true })
+      : await ImagePicker.launchImageLibraryAsync({ quality: 0.85, allowsEditing: true });
     if (!result.canceled) setImageUri(result.assets[0].uri);
   }
 
@@ -48,11 +52,24 @@ export default function UploadPrescriptionScreen() {
       Alert.alert('No image', 'Please select a prescription image first.');
       return;
     }
+    if (!appUser) {
+      Alert.alert('Authentication Required', 'Please log in to submit a prescription.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await submitPrescriptionOrder({ imageUri, message: '', address: '', phone: '' });
-      Alert.alert('Success', 'Prescription submitted!');
-      router.back();
+      await submitPrescriptionOrder({ 
+        imageUri, 
+        message: '', 
+        address: appUser.region || '', 
+        phone: appUser.phone || '',
+        paymentMethod: 'Cash on Delivery',
+        userId: appUser.uid,
+        userName: appUser.name || 'User'
+      });
+      Alert.alert('Success', 'Prescription submitted successfully!');
+      router.replace('/(tabs)/prescription');
     } catch {
       Alert.alert('Error', 'Failed to submit. Please try again.');
     } finally {
@@ -61,21 +78,24 @@ export default function UploadPrescriptionScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-[#F8FAFC]" style={{ paddingTop: insets.top }}>
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Custom header */}
       <Animated.View
         entering={FadeInDown.duration(400)}
-        className="flex-row items-center px-5 py-4 border-b border-gray-100"
+        className="flex-row items-center px-5 py-5 bg-white border-b border-gray-100 shadow-sm"
       >
         <TouchableOpacity
           onPress={() => router.back()}
-          className="w-9 h-9 rounded-xl bg-gray-100 items-center justify-center mr-3"
+          className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 items-center justify-center mr-3"
         >
-          <Ionicons name="arrow-back" size={18} color="#374151" />
+          <Ionicons name="arrow-back" size={20} color="#1F2937" />
         </TouchableOpacity>
-        <Text className="text-lg font-black text-gray-900">Upload Prescription</Text>
+        <View>
+            <Text className="text-xl font-black text-gray-900 tracking-tight">Upload Prescription</Text>
+            <Text className="text-[10px] text-teal-600 font-bold uppercase tracking-widest">Medical Concierge</Text>
+        </View>
       </Animated.View>
 
       <ScrollView
@@ -87,35 +107,37 @@ export default function UploadPrescriptionScreen() {
         <Animated.View entering={FadeInDown.delay(80).duration(400)}>
           {!imageUri ? (
             <View
-              className="border-2 border-dashed border-violet-200 bg-violet-50/40 rounded-3xl p-8 items-center mb-5"
-              style={{ gap: 12 }}
+              className="border-2 border-dashed border-teal-200 bg-teal-50/30 rounded-[32px] p-10 items-center mb-6"
+              style={{ gap: 14 }}
             >
               <View
-                className="w-20 h-20 bg-violet-100 rounded-3xl items-center justify-center"
-                style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 6 }}
+                className="w-24 h-24 bg-teal-600 rounded-[32px] items-center justify-center"
+                style={{ shadowColor: '#0D9488', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 12 }}
               >
-                <Ionicons name="document-text-outline" size={36} color="#6C63FF" />
+                <Ionicons name="document-attach" size={44} color="#fff" />
               </View>
-              <Text className="text-base font-black text-gray-900">Upload Prescription</Text>
-              <Text className="text-xs text-gray-400 text-center leading-4">
-                Take a clear photo or choose from your gallery
-              </Text>
+              <View className="items-center">
+                  <Text className="text-lg font-black text-gray-900">Digital Scan</Text>
+                  <Text className="text-xs text-gray-500 text-center leading-5 mt-1 px-4">
+                    Position your prescription in a well-lit area for the most accurate quote
+                  </Text>
+              </View>
 
-              <View className="flex-row gap-3 w-full mt-2">
+              <View className="flex-row gap-4 w-full mt-4">
                 {(['camera', 'gallery'] as const).map((src) => (
                   <TouchableOpacity
                     key={src}
                     onPress={() => pickImage(src)}
-                    className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 flex-row items-center justify-center gap-2"
-                    style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 }}
+                    className="flex-1 bg-white border border-gray-100 rounded-2xl py-4 flex-row items-center justify-center gap-2.5"
+                    style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 3 }}
                     activeOpacity={0.8}
                   >
                     <Ionicons
-                      name={src === 'camera' ? 'camera-outline' : 'images-outline'}
-                      size={18}
-                      color="#6C63FF"
+                      name={src === 'camera' ? 'camera' : 'images'}
+                      size={20}
+                      color="#0F766E"
                     />
-                    <Text className="text-xs font-bold text-violet-600 capitalize">{src}</Text>
+                    <Text className="text-sm font-black text-teal-900 capitalize">{src}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -123,19 +145,25 @@ export default function UploadPrescriptionScreen() {
           ) : (
             <Animated.View
               entering={ZoomIn.springify()}
-              className="rounded-3xl overflow-hidden mb-5"
-              style={{ shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 }}
+              className="rounded-[32px] overflow-hidden mb-6 border-4 border-white"
+              style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 15 }}
             >
-              <Image source={{ uri: imageUri }} className="w-full h-52" resizeMode="cover" />
-              <View className="bg-white px-4 py-3 flex-row items-center justify-between">
-                <View className="flex-row items-center gap-2">
-                  <View className="w-8 h-8 bg-emerald-100 rounded-xl items-center justify-center">
-                    <Ionicons name="checkmark" size={16} color="#10B981" />
+              <Image source={{ uri: imageUri }} className="w-full h-64" contentFit="cover" />
+              <View className="bg-white px-5 py-4 flex-row items-center justify-between">
+                <View className="flex-row items-center gap-3">
+                  <View className="w-9 h-9 bg-emerald-50 rounded-xl items-center justify-center border border-emerald-100">
+                    <Ionicons name="checkmark-done" size={18} color="#059669" />
                   </View>
-                  <Text className="text-xs font-semibold text-gray-800">prescription.jpg</Text>
+                  <View>
+                      <Text className="text-xs font-black text-gray-900">Document ready</Text>
+                      <Text className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ready for pharmacist</Text>
+                  </View>
                 </View>
-                <TouchableOpacity onPress={() => setImageUri(null)}>
-                  <Text className="text-xs font-bold text-violet-600">Change</Text>
+                <TouchableOpacity 
+                    onPress={() => setImageUri(null)}
+                    className="bg-gray-50 px-4 py-2 rounded-lg border border-gray-100"
+                >
+                  <Text className="text-xs font-black text-teal-700">Retake</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>
@@ -145,50 +173,61 @@ export default function UploadPrescriptionScreen() {
         {/* Tips */}
         <Animated.View
           entering={FadeInDown.delay(160).duration(400)}
-          className="bg-gray-50 rounded-3xl p-4 mb-6"
+          className="bg-white rounded-[28px] p-6 mb-8 border border-gray-100 shadow-sm"
         >
-          <View className="flex-row items-center gap-2 mb-3">
-            <View className="w-6 h-6 bg-amber-100 rounded-lg items-center justify-center">
-              <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
+          <View className="flex-row items-center gap-3 mb-5">
+            <View className="w-8 h-8 bg-amber-50 rounded-xl items-center justify-center border border-amber-100">
+              <Ionicons name="sparkles" size={16} color="#D97706" />
             </View>
-            <Text className="text-xs font-black text-gray-700">Tips for best results</Text>
+            <Text className="text-sm font-black text-gray-800">Quality Checklist</Text>
           </View>
-          {tips.map((tip, i) => (
-            <Animated.View
-              key={tip.text}
-              entering={FadeInDown.delay(i * 50 + 200).duration(300)}
-              className="flex-row items-center gap-3 mb-2.5"
-            >
-              <View className="w-7 h-7 bg-violet-100 rounded-xl items-center justify-center">
-                <Ionicons name={tip.icon as any} size={14} color="#6C63FF" />
-              </View>
-              <Text className="text-xs text-gray-500 flex-1">{tip.text}</Text>
-            </Animated.View>
-          ))}
+          <View className="gap-4">
+              {tips.map((tip, i) => (
+                <Animated.View
+                  key={tip.text}
+                  entering={FadeInDown.delay(i * 80 + 200).duration(300)}
+                  className="flex-row items-center gap-4"
+                >
+                  <View className="w-9 h-9 bg-teal-50 rounded-xl items-center justify-center">
+                    <Ionicons name={tip.icon as any} size={16} color="#0F766E" />
+                  </View>
+                  <Text className="text-xs font-bold text-gray-500 flex-1 leading-5">{tip.text}</Text>
+                </Animated.View>
+              ))}
+          </View>
         </Animated.View>
       </ScrollView>
 
       {/* Submit button */}
-      <View className="px-5">
+      <View className="px-5 pb-6">
         <Animated.View style={btnStyle}>
           <TouchableOpacity
             onPress={handleSubmit}
-            onPressIn={() => { btnScale.value = withSpring(0.97); }}
+            onPressIn={() => { btnScale.value = withSpring(0.95); }}
             onPressOut={() => { btnScale.value = withSpring(1); }}
             disabled={!imageUri || loading}
             activeOpacity={0.9}
-            className={`rounded-2xl py-4 items-center ${imageUri && !loading ? 'bg-violet-600' : 'bg-violet-300'}`}
-            style={imageUri ? { shadowColor: '#6C63FF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 10 } : {}}
+            className={`rounded-2xl py-5 items-center flex-row justify-center gap-3 ${imageUri && !loading ? 'bg-teal-700' : 'bg-gray-200'}`}
+            style={imageUri ? { shadowColor: '#0F766E', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 12 } : {}}
           >
-            <Text className="text-white font-bold text-sm">
-            {loading ? 'Submitting...' : 'Submit Prescription'}
-            </Text>
+            {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+            ) : (
+                <>
+                    <Ionicons name="cloud-done" size={22} color="#fff" />
+                    <Text className="text-white font-black text-base tracking-tight">
+                        Confirm & Upload
+                    </Text>
+                </>
+            )}
           </TouchableOpacity>
         </Animated.View>
       </View>
     </View>
   );
 }
+
+
 
 
 

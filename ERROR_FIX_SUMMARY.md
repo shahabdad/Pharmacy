@@ -234,3 +234,4 @@ To create an admin account, use one of these emails during registration:
 **Status**: ✅ RESOLVED
 **Documentation**: Complete
 **User Action**: Create account using Register tab
+
