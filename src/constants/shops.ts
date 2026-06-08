@@ -1,27 +1,3 @@
-/**
- * Shop Configuration
- * 
- * Currently supports single shop: "MediCare"
- * All orders are automatically assigned to this default shop.
- * 
- * Future Enhancements:
- * ────────────────────
- * 1. Multi-shop system:
- *    - Support multiple pharmacy shops
- *    - Shop-specific inventory and pricing
- *    - Shop-specific admin dashboards
- * 
- * 2. Region-based shop selection:
- *    - Automatically assign shop based on user's region/location
- *    - Distance-based shop matching
- *    - Regional delivery zones
- * 
- * 3. Shop management features:
- *    - Shop registration and approval workflow
- *    - Shop performance analytics
- *    - Shop-specific promotions and offers
- */
-
 export interface ShopConfig {
   id: string;
   name: string;
@@ -85,8 +61,7 @@ export function getShopById(shopId: string): ShopConfig | null {
  * @returns Array of active shop configurations
  */
 export function getAllActiveShops(): ShopConfig[] {
-  // TODO: Fetch from database when multi-shop is implemented
-  // For now, return only default shop
+ 
   return [DEFAULT_SHOP];
 }
 

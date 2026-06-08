@@ -16,7 +16,7 @@ const firebaseConfig = {
   storageBucket:     process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId:             process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  databaseURL:       process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL || 'https://pharmacy-8086d-default-rtdb.firebaseio.com/',
+  databaseURL:       process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];

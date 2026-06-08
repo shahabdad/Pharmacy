@@ -1,8 +1,3 @@
-/**
- * Global Contact Configuration for MediCare Mardan
- * Update these values to change contact details across the entire app.
- */
-
 export const CONTACT_CONFIG = {
   // WhatsApp number (must include country code without '+' for the URL)
   whatsapp: '+923191796621',
