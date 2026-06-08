@@ -1,0 +1,93 @@
+App Name: Medicare
+Internal Package Name: fastmadic
+
+Summary:
+This project is a pharmacy delivery and prescription management mobile app built with Expo, React Native, and TypeScript. The app is designed to allow customers to upload prescriptions, select pharmacies, receive quotes from admins, chat with pharmacy staff, and track prescription fulfillment. It also includes an admin panel for managing prescriptions, sending quotes, handling delivery status, and reviewing customer information.
+
+Main Technologies:
+- Expo SDK 54
+- React Native 0.81.5
+- React 19.1.0
+- TypeScript
+- Expo Router
+- Firebase (Authentication, Firestore, Storage)
+- AsyncStorage
+- NativeWind / Tailwind CSS
+- React Navigation
+- Expo Image Picker, Notifications, Web Browser, Splash Screen, Haptics, Linear Gradient
+- Firebase SDK 11.x
+- Google Sign-In support
+- React Native Reanimated, Gesture Handler, Safe Area Context
+
+Architecture and Key Components:
+- src/app: Route-based screens and navigation layout
+- src/components: reusable UI components
+- src/services: business logic and Firebase integration
+- src/context/AuthContext.tsx: authentication state and user session management
+- src/hooks/useTheme.ts & use-color-scheme.ts: theme and color scheme support
+- src/firebase/config.ts: Firebase configuration and initialization
+- src/constants: app constants for theme, shop details, admin emails, contact information
+- src/utils: helper utilities for WhatsApp links and form validation
+- src/types/index.ts: TypeScript type definitions
+
+User-facing Screens and Flow:
+- LoginScreen.tsx: email/password authentication
+- RegisterScreen.tsx: account creation and role selection
+- User dashboard and tabs: prescription list, chat, profile, help, upload prescription
+- Upload Prescription: image selection, shop selection, prescription submission
+- Prescription detail pages: view prescription details and admin quote
+- Chat screens: real-time chat between user and admin
+- Terms & Privacy pages: legal content display
+
+Admin-facing Screens and Flow:
+- AdminDashboard.tsx: admin overview of prescriptions and tasks
+- Admin route group: admin users, admin prescriptions, admin chats, admin reports
+- Notification screen: admin notification control
+- Admin chat detail: view and reply to user chats
+- Admin prescriptions and user management: review prescriptions, update statuses, manage customers
+
+Reusable UI Components:
+- AuthButton.tsx: styled authentication buttons
+- ChatThread.tsx: threaded message display
+- DeliveryModal.tsx: delivery status dialog
+- LoadingScreen.tsx: loading indicator screen
+- MessageModal.tsx: modal messages and confirmations
+- ModernAlert.tsx: custom alert UI
+- OrderCard.tsx: order summary cards
+- PrescriptionCard.tsx: prescription listing cards
+- PrescriptionWorkflow.tsx: prescription tracking flow UI
+- Skeleton.tsx: loading skeleton placeholder
+- auth controls: RegisterForm.tsx, LoginForm.tsx, GoogleButton.tsx, Field.tsx
+
+Services and Functional Logic:
+- authService.ts: authentication operations, login, register, session handling
+- userService.ts: customer data and profile operations
+- adminService.ts: admin-specific actions and management
+- shopService.ts: shop listing, selection, and region-based shop data
+- prescriptionService.ts: prescription creation, retrieval, status updates
+- orderService.ts: order and delivery management
+- chatService.ts: Firestore chat messaging and listeners
+- notificationService.ts: notifications and WhatsApp integration logic
+- dashboardService.ts & reportService.ts: admin dashboard and reporting-related data
+- productService.ts: product or pharmacy item support
+
+App Behavior and Working Flow:
+1. User registers and logs in with email/password (and optionally Google sign-in support).
+2. The app stores authentication state in Firebase and persists session information.
+3. Customers upload prescription images, select a pharmacy/shop, and submit the request.
+4. Admins receive prescription entries, review images, and send price quotes or status updates.
+5. Users can accept or reject the quote and continue messaging the admin through an in-app chat.
+6. The system supports order tracking, delivery updates, and confirmation workflows.
+7. WhatsApp links are generated for notifications and external communication with customers.
+
+How the App Works for Users:
+- Customer method: register, login, upload prescription, choose shop, send prescription, track status, chat with admin, approve quote, receive delivery updates.
+- Admin method: login, review prescription list, send quotes, update prescription status, chat with customers, manage users and reports.
+
+Documentation and Project Text:
+The repository includes extensive documentation files for authentication flow, admin panel design, UI/UX guidelines, setup instructions, project summaries, and workflow diagrams. These docs describe authentication implementation, admin/user workflow, shop system design, and mobile UI structure.
+
+Notes:
+- The repo includes both a project-level README and quick start guide.
+- The app icon and branding name is Medicare, while the package name is fastmadic.
+- Exact build/create timestamps are not present in the repository metadata.
