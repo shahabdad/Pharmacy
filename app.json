@@ -5,22 +5,22 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "medicare",
-    "icon": "./assets/images/Medi.png",
+    "icon": "./assets/images/logo01.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/Medi.png",
+      "image": "./assets/images/logo01.png",
       "resizeMode": "contain",
       "backgroundColor": "#6366F1"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.medicare.app",
-      "icon": "./assets/images/Medi.png"
+      "icon": "./assets/images/logo01.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/Medi.png",
+        "foregroundImage": "./assets/images/logo01.png",
         "backgroundColor": "#6366F1"
       },
       "package": "com.medicare.app",
