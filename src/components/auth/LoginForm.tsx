@@ -12,7 +12,7 @@ function friendlyAuthError(code: string): string {
   switch (code) {
     case 'auth/invalid-email':
       return 'That email address is not valid.';
-    case 'auth/user-not-found':
+    case 'auth/user-not-found': 
     case 'auth/invalid-credential':
     case 'auth/wrong-password':
       return 'Email or password is incorrect.';
