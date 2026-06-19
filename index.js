@@ -1,7 +1,8 @@
-import { ExpoRoot } from 'expo-router';
-import { AppRegistry } from 'react-native';
+import { registerRootComponent } from 'expo';
 
-const RootComponent = ExpoRoot;
+import App from './App';
 
-AppRegistry.registerComponent('FastMadic', () => RootComponent);
-
+// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
+// It also ensures that whether you load the app in Expo Go or in a native build,
+// the environment is set up appropriately
+registerRootComponent(App);

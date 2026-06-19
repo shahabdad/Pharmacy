@@ -117,8 +117,10 @@ export default function AuthScreen() {
             <View className="flex-1 h-px bg-gray-200 dark:bg-slate-800" />
           </Animated.View>
 
-          {/* Google button */}
-          <GoogleButton delay={activeTab === 'login' ? 440 : 660} />
+          {/* Google button (disabled on iOS until iosClientId is configured) */}
+          {Platform.OS !== 'ios' && (
+            <GoogleButton delay={activeTab === 'login' ? 440 : 660} />
+          )}
 
           {/* Terms (only for register) */}
           {activeTab === 'register' && (
